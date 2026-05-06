@@ -16,7 +16,7 @@
     "require": ["bolt"],
     "pipeline": ["mecha"],
     "meta": {
-        "bolt": {"entrypoint": "reef"}
+        "bolt": {"entrypoint": "reef:*"}
     },
     "output": "build"
 }

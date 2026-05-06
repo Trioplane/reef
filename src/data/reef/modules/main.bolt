@@ -1,0 +1,17 @@
+function reef:load:
+    say reef!
+
+function reef:tick:
+    say REEF!
+
+append function_tag minecraft:load {
+    "values": [
+        "reef:load"
+    ]
+}
+
+append function_tag minecraft:tick {
+    "values": [
+        "reef:tick"
+    ]
+}
