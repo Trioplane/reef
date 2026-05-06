@@ -1,4 +1,5 @@
-![Reef Banner](repository/reef_banner.png)
+<center>![Reef Banner](repository/reef_banner.png)</center>
+
 Reef is a slideshow / slide deck / presentation library that provides tools to make, and present slideshows in-game in Minecraft: Java Edition.
 > [!WARNING]
 > This is currently **work in progress!** Be cautious when using this library in its unfinished state as it may break your world!
