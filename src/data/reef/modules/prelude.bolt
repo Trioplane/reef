@@ -1,0 +1,53 @@
+import builtins
+
+# GLOBAL VARIABLES
+G_ENVIRONMENT = "development"
+
+def get_environment():
+    """
+    Return the current environment
+    Returns:
+        development
+        production
+        summit*
+        
+        * = removed later on.
+    """
+    return G_ENVIRONMENT
+
+class Logger:
+    def __init__(self, namespace, is_dev = True):
+        self.namespace = namespace
+        self.is_dev = is_dev
+        self.prefix = ["", {"text": "[", "color": "#378762"}, {"text": self.namespace, "color": "#2ded9d"}, {"text": "] ", "color": "#378762"}]
+        self.colors = {
+            "info": "#77d6ff",
+            "warn": "#ffed87",
+            "error": "#fa4267"
+        }
+
+    def inject_color(self, message, color):
+        if isinstance(message, str):
+            return {"text": message, "color": color}
+        elif isinstance(message, dict):
+            return {**message, "color": color}
+        elif isinstance(message, list):
+            return [{"text": "", "color": color}] + message
+        else:
+            raise TypeError("`message` is expected to be a string, dictionary, or a list")
+
+    def _log(self, receiver, message, level):
+        # Don't compile if this is a dev logger and building production
+        if get_environment() == "production" and self.is_dev == true:
+            return
+        component = [self.prefix, self.inject_color(message, self.colors[level])]
+        raw f"tellraw {receiver} {component}"
+
+    def info(self, receiver, message):
+        self._log(receiver, message, "info")
+
+    def warn(self, receiver, message):
+        self._log(receiver, message, "warn")
+
+    def error(self, receiver, message):
+        self._log(receiver, message, "error")

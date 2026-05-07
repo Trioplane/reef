@@ -1,8 +1,11 @@
+LOGGER = Logger("reef", false)
+DEV_LOGGER = Logger("reef_dev")
+
 function reef:load:
-    say reef!
+    LOGGER.info("@a[tag=reef.permissions.read_logs]", f"Loaded! (version {ctx.project_version})")
 
 function reef:tick:
-    say REEF!
+    ...
 
 append function_tag minecraft:load {
     "values": [

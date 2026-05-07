@@ -1,0 +1,12 @@
+function ~/define_test_slideshow:
+    data modify storage reef.test:slideshow "reef.test:foo" set value {
+        foo: "bar"
+    }
+
+function ~/remove_test_slideshow:
+    data remove storage reef.test:slideshow "reef.test:foo"
+
+function ~/reload_test_slideshow:
+    data modify storage reef:in register.slideshow.identifier set value "reef.test:foo"
+    data modify storage reef:in register.slideshow.storage_path set value 'reef.test:slideshow "reef.test:foo"'
+    function reef:api/register/slideshow with storage reef:in register.slideshow

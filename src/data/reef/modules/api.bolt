@@ -1,0 +1,26 @@
+from reef:main import LOGGER
+from reef:main import DEV_LOGGER
+
+function ~/register/slideshow:
+    # @args (identifier, storage_path)
+    # check if theres an existing slideshow in the master registry
+    # if yes > remove it and set it again
+    # if no > just set it
+    $execute unless data storage $(storage_path) run return run function reef:api/register/slideshow/errors/slideshow_not_found
+    function ~/errors/slideshow_not_found:
+        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Slideshow data was not found at ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, "."])
+
+    if get_environment() == "development":
+        $execute if data storage reef:registry slideshow."$(identifier)" run function reef:api/register/slideshow/dev_logs/reload_slideshow 
+        function ~/dev_logs/reload_slideshow:
+            DEV_LOGGER.info("@a", "Slideshow exists, reloading entry")
+
+    $data remove storage reef:registry slideshow."$(identifier)"
+    $data modify storage reef:registry slideshow."$(identifier)" set from storage $(storage_path)
+    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Slideshow data ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.slideshow.identifier"}])
+
+function ~/register/page:
+    ...
+
+function ~/register/transition:
+    ...

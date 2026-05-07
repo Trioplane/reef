@@ -2,6 +2,7 @@
     "author": "Trplnr",
     "name": "Reef",
     "description": "Create stunning presentations completely in vanilla Minecraft: Java Edition",
+    "version": "1.0.0-alpha1",
     "minecraft": "26.1",
     "data_pack": {
         "load": ["src"],
@@ -13,10 +14,17 @@
         "min_format": [101,0],
         "max_format": [101,0]
     },
-    "require": ["bolt"],
     "pipeline": ["mecha"],
+    "require": [
+        "bolt",
+        "bolt_expressions",
+        "bolt_native_macros"
+    ],
     "meta": {
-        "bolt": {"entrypoint": "reef:*"}
+        "bolt": {
+            "entrypoint": "reef:*",
+            "prelude": "reef:prelude"
+        }
     },
     "output": "build"
 }
