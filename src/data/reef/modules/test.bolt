@@ -10,3 +10,29 @@ function ~/reload_test_slideshow:
     data modify storage reef:in register.slideshow.identifier set value "reef.test:foo"
     data modify storage reef:in register.slideshow.storage_path set value 'reef.test:slideshow "reef.test:foo"'
     function reef:api/register/slideshow with storage reef:in register.slideshow
+
+function ~/define_test_page:
+    data modify storage reef.test:page "reef.test:foo" set value {
+        foo: "bar"
+    }
+
+function ~/remove_test_page:
+    data remove storage reef.test:page "reef.test:foo"
+
+function ~/reload_test_page:
+    data modify storage reef:in register.page.identifier set value "reef.test:foo"
+    data modify storage reef:in register.page.storage_path set value 'reef.test:page "reef.test:foo"'
+    function reef:api/register/page with storage reef:in register.page
+
+function ~/define_test_transition:
+    data modify storage reef.test:transition "reef.test:foo" set value {
+        foo: "bar"
+    }
+
+function ~/remove_test_transition:
+    data remove storage reef.test:transition "reef.test:foo"
+
+function ~/reload_test_transition:
+    data modify storage reef:in register.transition.identifier set value "reef.test:foo"
+    data modify storage reef:in register.transition.storage_path set value 'reef.test:transition "reef.test:foo"'
+    function reef:api/register/transition with storage reef:in register.transition

@@ -10,17 +10,24 @@ function ~/register/slideshow:
     function ~/errors/slideshow_not_found:
         LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Slideshow data was not found at ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, "."])
 
-    if get_environment() == "development":
-        $execute if data storage reef:registry slideshow."$(identifier)" run function reef:api/register/slideshow/dev_logs/reload_slideshow 
-        function ~/dev_logs/reload_slideshow:
-            DEV_LOGGER.info("@a", "Slideshow exists, reloading entry")
-
     $data remove storage reef:registry slideshow."$(identifier)"
     $data modify storage reef:registry slideshow."$(identifier)" set from storage $(storage_path)
     LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Slideshow data ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.slideshow.identifier"}])
 
 function ~/register/page:
-    ...
+    $execute unless data storage $(storage_path) run return run function reef:api/register/page/errors/page_not_found
+    function ~/errors/page_not_found:
+        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Page data was not found at ", {storage: "reef:in", nbt: "register.page.storage_path"}, "."])
+
+    $data remove storage reef:registry page."$(identifier)"
+    $data modify storage reef:registry page."$(identifier)" set from storage $(storage_path)
+    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Page data ", {storage: "reef:in", nbt: "register.page.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.page.identifier"}])
 
 function ~/register/transition:
-    ...
+    $execute unless data storage $(storage_path) run return run function reef:api/register/transition/errors/transition_not_found
+    function ~/errors/transition_not_found:
+        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Transition data was not found at ", {storage: "reef:in", nbt: "register.transition.storage_path"}, "."])
+
+    $data remove storage reef:registry transition."$(identifier)"
+    $data modify storage reef:registry transition."$(identifier)" set from storage $(storage_path)
+    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Transition data ", {storage: "reef:in", nbt: "register.transition.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.transition.identifier"}])

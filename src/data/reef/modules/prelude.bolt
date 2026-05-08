@@ -1,19 +1,13 @@
-import builtins
+from dataclasses import dataclass, field 
 
-# GLOBAL VARIABLES
-G_ENVIRONMENT = "development"
+@dataclass
+class EnvironmentOptions:
+    dev_logs: bool = False
 
-def get_environment():
-    """
-    Return the current environment
-    Returns:
-        development
-        production
-        summit*
-        
-        * = removed later on.
-    """
-    return G_ENVIRONMENT
+@dataclass
+class Environment:
+    name: str
+    options: EnvironmentOptions = field(default_factory=EnvironmentOptions)
 
 class Logger:
     def __init__(self, namespace, is_dev = True):
@@ -38,7 +32,7 @@ class Logger:
 
     def _log(self, receiver, message, level):
         # Don't compile if this is a dev logger and building production
-        if get_environment() == "production" and self.is_dev == true:
+        if not G_ENVIRONMENT.options.dev_logs and self.is_dev == true:
             return
         component = [self.prefix, self.inject_color(message, self.colors[level])]
         raw f"tellraw {receiver} {component}"
@@ -51,3 +45,11 @@ class Logger:
 
     def error(self, receiver, message):
         self._log(receiver, message, "error")
+
+# GLOBAL VARIABLES
+G_ENVIRONMENT_TYPES = {
+    "development": Environment(name="development", options=EnvironmentOptions(dev_logs=True)),
+    "production": Environment(name="production", options=EnvironmentOptions(dev_logs=False)),
+    "summit": Environment(name="summit", options=EnvironmentOptions(dev_logs=true))
+}
+G_ENVIRONMENT = G_ENVIRONMENT_TYPES.development
