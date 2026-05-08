@@ -13,7 +13,7 @@ class Logger:
     def __init__(self, namespace, is_dev = True):
         self.namespace = namespace
         self.is_dev = is_dev
-        self.prefix = ["", {"text": "[", "color": "#378762"}, {"text": self.namespace, "color": "#2ded9d"}, {"text": "] ", "color": "#378762"}]
+        self.prefix = ["", {"text": "[", "color": "#6e3787"}, {"text": self.namespace, "color": "#ed2de3"}, {"text": "] ", "color": "#6e3787"}]
         self.colors = {
             "info": "#77d6ff",
             "warn": "#ffed87",
