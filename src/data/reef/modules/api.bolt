@@ -1,33 +1,22 @@
 from reef:main import LOGGER
 from reef:main import DEV_LOGGER
 
-function ~/register/slideshow:
-    # @args (identifier, storage_path)
-    # check if theres an existing slideshow in the master registry
-    # if yes > remove it and set it again
-    # if no > just set it
-    $execute unless data storage $(storage_path) run return run function reef:api/register/slideshow/errors/slideshow_not_found
-    function ~/errors/slideshow_not_found:
-        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Slideshow data was not found at ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, "."])
+function ~/load:
+    DEV_LOGGER.info("@a", "api module loaded")
 
-    $data remove storage reef:registry slideshow."$(identifier)"
-    $data modify storage reef:registry slideshow."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Slideshow data ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.slideshow.identifier"}])
+function ~/register/slideshow:
+    $data modify storage reef:in register.slideshow set value {identifier: '$(identifier)', storage_path: '$(storage_path)'}
+    function reef:zzzinternals/register/slideshow with storage reef:in register.slideshow
 
 function ~/register/page:
-    $execute unless data storage $(storage_path) run return run function reef:api/register/page/errors/page_not_found
-    function ~/errors/page_not_found:
-        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Page data was not found at ", {storage: "reef:in", nbt: "register.page.storage_path"}, "."])
-
-    $data remove storage reef:registry page."$(identifier)"
-    $data modify storage reef:registry page."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Page data ", {storage: "reef:in", nbt: "register.page.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.page.identifier"}])
+    $data modify storage reef:in register.page set value {identifier: '$(identifier)', storage_path: '$(storage_path)'}
+    function reef:zzzinternals/register/page with storage reef:in register.page
 
 function ~/register/transition:
-    $execute unless data storage $(storage_path) run return run function reef:api/register/transition/errors/transition_not_found
-    function ~/errors/transition_not_found:
-        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Transition data was not found at ", {storage: "reef:in", nbt: "register.transition.storage_path"}, "."])
+    $data modify storage reef:in register.transition set value {identifier: '$(identifier)', storage_path: '$(storage_path)'}
+    function reef:zzzinternals/register/transition with storage reef:in register.transition
 
-    $data remove storage reef:registry transition."$(identifier)"
-    $data modify storage reef:registry transition."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Transition data ", {storage: "reef:in", nbt: "register.transition.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.transition.identifier"}])
+function ~/screen/summon:
+    summon item_display ~ ~ ~ {
+        Tags: ["reef.screen"]
+    }
