@@ -1,6 +1,41 @@
 from reef:main import LOGGER
 from reef:main import DEV_LOGGER
 
+class IDFunction:
+    def __init__(self, name):
+        self.score_name = f"reef.zzzinternals.{name}.id"
+
+        append function reef:zzzinternals/load:
+            scoreboard objectives add self.score_name dummy
+
+        function f"reef:zzzinternals/id/{name}":
+            execute store result score @s self.score_name run scoreboard players add .next self.score_name 1
+
+        predicate f"reef:zzzinternals/id_link/{name}" ({
+            "condition": "minecraft:entity_scores",
+            "entity": "this",
+            "scores": {
+                self.score_name: {
+                    "min": {
+                        "type": "minecraft:score",
+                        "target": {
+                            "type": "minecraft:fixed",
+                            "name": ".compare_value"
+                        },
+                        "score": "reef.zzzinternals.id_link"
+                    },
+                    "max": {
+                        "type": "minecraft:score",
+                        "target": {
+                            "type": "minecraft:fixed",
+                            "name": ".compare_value"
+                        },
+                        "score": "reef.zzzinternals.id_link"
+                    }
+                }
+            }
+        })
+
 function ~/load:
     DEV_LOGGER.info("@a", "zzzinternals module loaded")
 
@@ -8,32 +43,70 @@ function ~/register/slideshow:
     # @args (identifier, storage_path)
     $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/slideshow/errors/slideshow_not_found
     function ~/errors/slideshow_not_found:
-        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Slideshow data was not found at ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, "."])
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Slideshow data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, "."])
 
-    $data remove storage reef:registry slideshow."$(identifier)"
-    $data modify storage reef:registry slideshow."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Slideshow data ", {storage: "reef:in", nbt: "register.slideshow.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.slideshow.identifier"}])
+    $data remove storage reef.zzzinternals:registry slideshow."$(identifier)"
+    $data modify storage reef.zzzinternals:registry slideshow."$(identifier)" set from storage $(storage_path)
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Slideshow data ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.identifier"}])
 
 function ~/register/page:
     $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/page/errors/page_not_found
     function ~/errors/page_not_found:
-        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Page data was not found at ", {storage: "reef:in", nbt: "register.page.storage_path"}, "."])
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Page data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.page.storage_path"}, "."])
 
-    $data remove storage reef:registry page."$(identifier)"
-    $data modify storage reef:registry page."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Page data ", {storage: "reef:in", nbt: "register.page.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.page.identifier"}])
+    $data remove storage reef.zzzinternals:registry page."$(identifier)"
+    $data modify storage reef.zzzinternals:registry page."$(identifier)" set from storage $(storage_path)
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Page data ", {storage: "reef.zzzinternals:in", nbt: "register.page.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.page.identifier"}])
 
 function ~/register/transition:
     $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/transition/errors/transition_not_found
     function ~/errors/transition_not_found:
-        LOGGER.error("@a[tag=reef.permissions.read_logs]", ["Transition data was not found at ", {storage: "reef:in", nbt: "register.transition.storage_path"}, "."])
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Transition data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, "."])
 
-    $data remove storage reef:registry transition."$(identifier)"
-    $data modify storage reef:registry transition."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.read_logs]", ["Transition data ", {storage: "reef:in", nbt: "register.transition.storage_path"}, " successfully registered as ", {storage: "reef:in", nbt: "register.transition.identifier"}])
+    $data remove storage reef.zzzinternals:registry transition."$(identifier)"
+    $data modify storage reef.zzzinternals:registry transition."$(identifier)" set from storage $(storage_path)
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Transition data ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}])
+# ------------------------------
 
+IDFunction("screen")
 function ~/screen/setup_entity:
     tag @s add reef.screen
+    if G_ENVIRONMENT.name == "summit": 
+        tag @s add summit.static
+    function reef:zzzinternals/id/screen
 
-function ~/give_id/screen:
-    ...
+function ~/screen/load_slideshow:
+    """
+    Expand the whole slideshow unpacking each page and transition into one big list
+    @s = reef.screen entity
+    """
+    DEV_LOGGER.info("@a", "=== starting unpack")
+
+    $data modify storage reef.zzzinternals:tmp root.slideshow_data.reference set from storage reef.zzzinternals:registry slideshow."$(id)"
+    data modify storage reef.zzzinternals:tmp root.slideshow_data.unpacked set value []
+
+    # Recurse and unpack pages
+    execute function ~/unpack_pages:
+        execute unless data storage reef.zzzinternals:tmp root.slideshow_data.reference[0] run return 1
+        DEV_LOGGER.info("@a", "unpacking page...")
+
+        data modify storage reef.zzzinternals:tmp root.slideshow_data.current.page_id set from storage reef.zzzinternals:tmp root.slideshow_data.reference[0]
+        with storage reef.zzzinternals:tmp root.slideshow_data.current:
+            $data modify storage reef.zzzinternals:tmp root.slideshow_data.unpacked append from storage reef.zzzinternals:registry page."$(page_id)"
+            DEV_LOGGER.info("@a", "appended page :D")
+
+            # Now unpack the transition (nesting hell)
+            with storage reef.zzzinternals:tmp root.slideshow_data.unpacked[-1]:
+                $data modify storage reef.zzzinternals:tmp root.slideshow_data.unpacked[-1].transition set from storage reef.zzzinternals:registry transition."$(transition)"
+                DEV_LOGGER.info("@a", "unpacked transition")
+
+        data remove storage reef.zzzinternals:tmp root.slideshow_data.reference[0]
+        DEV_LOGGER.info("@a", "removed index 0")
+        function ~/../unpack_pages
+
+    DEV_LOGGER.info("@a", "=== unpacking finished :D")
+
+    data modify entity @s data.reef.screen.slideshow.data set from storage reef.zzzinternals:tmp root.slideshow_data.unpacked
+    DEV_LOGGER.info("@a", "put unpacked slideshow to entity slideshow data")
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Successfuly loaded slideshow data to screen ID #", {score: {name: "@s", objective: "reef.zzzinternals.screen.id"}}])
+        

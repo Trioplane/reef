@@ -28,7 +28,7 @@ class Logger:
         elif isinstance(message, list):
             return [{"text": "", "color": color}] + message
         else:
-            raise TypeError("`message` is expected to be a string, dictionary, or a list")
+            raise TypeError("`message` must be a string, dictionary, or a list")
 
     def _log(self, receiver, message, level):
         # Don't compile if this is a dev logger and building production
