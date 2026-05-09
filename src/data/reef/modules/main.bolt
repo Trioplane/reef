@@ -16,7 +16,20 @@ function reef:uninstall:
     data remove storage reef.zzzinternals:registry page
     data remove storage reef.zzzinternals:registry transition
     data remove storage reef.zzzinternals:tmp root
+
     scoreboard objectives remove reef.zzzinternals.screen.id
+    scoreboard objectives remove reef.zzzinternals.element.animated_graphic.current_frame
+    scoreboard objectives remove reef.zzzinternals.element.id
+    scoreboard objectives remove reef.zzzinternals.screen.slideshow.pages
+    scoreboard objectives remove reef.zzzinternals.screen.slideshow.current_page
+    scoreboard objectives remove reef.zzzinternals.screen.slideshow.transition.current_frame
+    scoreboard objectives remove reef.zzzinternals.screen.slideshow.transition.switch_frame
+    scoreboard objectives remove reef.zzzinternals.screen.slideshow.transition.frames
+    scoreboard objectives remove reef.zzzinternals.element.animated_graphic.frames
+    scoreboard objectives remove reef.zzzinternals.screen.slideshow.switch_to_page
+    scoreboard objectives remove reef.zzzinternals.parent.element.id
+    scoreboard objectives remove reef.zzzinternals.parent.screen.id
+    scoreboard objectives remove reef.zzzinternals.id_link
 
     kill @e[tag=reef.entity]
 

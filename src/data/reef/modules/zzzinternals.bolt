@@ -1,12 +1,34 @@
 from reef:main import LOGGER
 from reef:main import DEV_LOGGER
+from bolt_expressions import Scoreboard, Data
+
+class PerformanceStopwatch:
+    def __init__(self, id):
+        self.id = id
+        stopwatch create self.id
+
+    def start(self):
+        stopwatch restart self.id
+
+    def stop(self):
+        execute store result score stopwatch trplnr.debug run stopwatch query self.id 10000
+
+    def log(self):
+        execute store result storage trplnr:debug stopwatch float 0.0001 run scoreboard players get stopwatch trplnr.debug
+        DEV_LOGGER.info("@a", [f"{self.id} took ", {storage: "trplnr:debug", nbt: "stopwatch"}, " seconds"])
+
+    def stop_and_log(self):
+        self.stop()
+        self.log()
 
 class IDFunction:
     def __init__(self, name):
         self.score_name = f"reef.zzzinternals.{name}.id"
+        self.parent_name = f"reef.zzzinternals.parent.{name}.id"
 
         append function reef:zzzinternals/load:
             scoreboard objectives add self.score_name dummy
+            scoreboard objectives add self.parent_name dummy
 
         function f"reef:zzzinternals/id/{name}":
             execute store result score @s self.score_name run scoreboard players add .next self.score_name 1
@@ -36,13 +58,43 @@ class IDFunction:
             }
         })
 
+        predicate f"reef:zzzinternals/id_link/parent/{name}" ({
+            "condition": "minecraft:entity_scores",
+            "entity": "this",
+            "scores": {
+                self.parent_name: {
+                    "min": {
+                        "type": "minecraft:score",
+                        "target": {
+                            "type": "minecraft:fixed",
+                            "name": ".compare_value"
+                        },
+                        "score": "reef.zzzinternals.id_link"
+                    },
+                    "max": {
+                        "type": "minecraft:score",
+                        "target": {
+                            "type": "minecraft:fixed",
+                            "name": ".compare_value"
+                        },
+                        "score": "reef.zzzinternals.id_link"
+                    }
+                }
+            }
+        })
+
 function ~/load:
+    scoreboard objectives add reef.zzzinternals.id_link dummy
+
     scoreboard objectives add reef.zzzinternals.screen.slideshow.current_page dummy
     scoreboard objectives add reef.zzzinternals.screen.slideshow.switch_to_page dummy
     scoreboard objectives add reef.zzzinternals.screen.slideshow.pages dummy
     scoreboard objectives add reef.zzzinternals.screen.slideshow.transition.current_frame dummy
     scoreboard objectives add reef.zzzinternals.screen.slideshow.transition.frames dummy
     scoreboard objectives add reef.zzzinternals.screen.slideshow.transition.switch_frame dummy
+
+    scoreboard objectives add reef.zzzinternals.element.animated_graphic.current_frame dummy
+    scoreboard objectives add reef.zzzinternals.element.animated_graphic.frames dummy
 
     DEV_LOGGER.info("@a", "zzzinternals module loaded")
 
@@ -124,13 +176,15 @@ function ~/screen/load_slideshow:
     data modify entity @s data.reef.screen.slideshow.data set from storage reef.zzzinternals:tmp root.slideshow_data.unpacked
     execute store result score @s reef.zzzinternals.screen.slideshow.pages run data get entity @s data.reef.screen.slideshow.data
     scoreboard players set @s reef.zzzinternals.screen.slideshow.switch_to_page 0
-    function reef:zzzinternals/screen/load_page
+    function reef:zzzinternals/screen/cut_to_page
 
     DEV_LOGGER.info("@a", "put unpacked slideshow to entity slideshow data")
     LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Successfuly loaded slideshow data to screen ID #", {score: {name: "@s", objective: "reef.zzzinternals.screen.id"}}])
 
 function ~/screen/cut_to_page:
-    ...
+    function reef:zzzinternals/screen/thy_shall_kill_elements
+    function reef:zzzinternals/screen/load_page
+    function reef:zzzinternals/screen/advance_page_sequence
 
 function ~/screen/transition_to_page:
     ...
@@ -144,9 +198,11 @@ function ~/screen/load_page:
     """
 
     function ~/errors/page_number_lt0:
+        scoreboard players operation @s reef.zzzinternals.screen.slideshow.switch_to_page = @s reef.zzzinternals.screen.slideshow.current_page
         LOGGER.error("@a[tag=reef.permissions.see_debug]", "Slideshow page number cannot be less than 0")
 
     function ~/errors/page_number_gtpages:
+        scoreboard players operation @s reef.zzzinternals.screen.slideshow.switch_to_page = @s reef.zzzinternals.screen.slideshow.current_page
         LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Slideshow page number cannot exceed page count (", {score: {name: "@s", objective: "reef.zzzinternals.screen.slideshow.pages"}}, ")"])
 
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/errors/page_number_lt0
@@ -167,21 +223,19 @@ function ~/screen/load_page:
     execute store result score @s reef.zzzinternals.screen.slideshow.transition.frames run data get entity @s data.reef.screen.slideshow.current.page_data.transition.frames
     execute store result score @s reef.zzzinternals.screen.slideshow.transition.switch_frame run data get entity @s data.reef.screen.slideshow.current.page_data.transition.switch_frame
 
-    DEV_LOGGER.warn("@a", "screen/load_page temporarily handles advancing page sequence")
-    DEV_LOGGER.warn("@a", "This should be moved to transition_to_page and cut_to_page")
-    function reef:zzzinternals/screen/advance_page_sequence
-
     #data modify entity @s data.reef.screen.slideshow.current.transition_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
     #data modify entity @s data.reef.screen.slideshow.current.sequence_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
+
+function ~/screen/thy_shall_kill_elements:
+    CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")[".compare_value"]
+    ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+    CompareValue = ScreenID["@s"]
+    kill @e[type=#reef:zzzinternals/screen_display,predicate=reef:zzzinternals/id_link/parent/screen]
 
 function ~/screen/advance_page_sequence:
     """
     Display the current element group and eat it to advance the element sequence
     """
-
-    # recurse through the element group
-    # display each one
-    # eat the sequence
 
     DEV_LOGGER.info("@a", "advancing page sequence...")
 
@@ -189,14 +243,121 @@ function ~/screen/advance_page_sequence:
         execute unless data entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0] run return:
             DEV_LOGGER.info("@a", "done displaying element group")
 
-        data modify entity @s data.reef.screen.slideshow.current.element set from entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0]
-        DEV_LOGGER.info("@a", ["DISPLAY ELEMENT: ", {entity: "@s", nbt: "data.reef.screen.slideshow.current.element.text"}])
+        data modify storage reef.zzzinternals:tmp root.element.data set from entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0]
+        execute at @s function ~/display_element:
+            execute if data storage reef.zzzinternals:tmp root.element.data{type:"text"} summon text_display run return run function reef:zzzinternals/screen/display/text
+            execute if data storage reef.zzzinternals:tmp root.element.data{type:"graphic"} summon item_display run return run function reef:zzzinternals/screen/display/graphic
+            execute if data storage reef.zzzinternals:tmp root.element.data{type:"animated_graphic"} summon text_display run return run function reef:zzzinternals/screen/display/animated_graphic
+        
+        ParentID = Scoreboard.objective("reef.zzzinternals.parent.screen.id")
+        ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+        ParentID["@n[type=#reef:zzzinternals/screen_display,tag=reef.element.new]"] = ScreenID["@s"]
+        tag @n[type=#reef:zzzinternals/screen_display,tag=reef.element.new] remove reef.element.new
 
         data remove entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0]
         function ~/../display_element_group
 
     DEV_LOGGER.info("@a", "ate page sequence")
     data remove entity @s data.reef.screen.slideshow.current.page_data.sequence[0]
+
+entity_type_tag ~/screen_display {
+    "values": [
+        "minecraft:text_display",
+        "minecraft:item_display"
+    ]
+}
+
+function ~/screen/display/common:
+    tag @s add reef.entity
+    tag @s add reef.element
+    tag @s add reef.element.new
+
+    Self = Data.entity("@s")
+    TempStorage = Data.storage(reef.zzzinternals:tmp).root
+    Transformation = Self.transformation
+    ElementData = TempStorage.element.data
+
+    # tp relative to screen
+    if not ElementData.pos:
+        DEV_LOGGER.info("@a", "like wha?")
+        ElementData.pos = [0, 0, 0]
+
+    rotate @s ~ ~
+    
+    TempStorage.element.pos.x = ElementData.pos[0]
+    TempStorage.element.pos.y = ElementData.pos[1]
+    TempStorage.element.pos.z = ElementData.pos[2]
+
+    with var TempStorage.element.pos:
+        $tp @s ^$(x) ^$(y) ^$(z)
+
+    Transformation.translation = ElementData.translation
+
+    if not ElementData.scale:
+        ElementData.scale = [1.0, 1.0, 0.01]
+
+    Transformation.scale = ElementData.scale
+    Transformation.left_rotation = ElementData.left_rotation
+    Transformation.right_rotation = ElementData.right_rotation
+    Self.brightness = {block: 15, sky: 15}
+
+function ~/screen/display/text:
+    function ~/../common
+    if G_ENVIRONMENT.name == "summit": 
+        tag @s add summit.static
+
+    Self = Data.entity("@s")
+    TempStorage = Data.storage(reef.zzzinternals:tmp).root
+    ElementData = TempStorage.element.data
+
+    Self.text = ElementData.text
+
+    if not ElementData.background:
+        ElementData.background = 0
+        
+    Self.background = ElementData.background
+    Self.alignment = ElementData.alignment
+    Self.line_width = ElementData.width
+
+    DEV_LOGGER.info("@a", "DISPLAYING TEXT ELEMENT")
+
+function ~/screen/display/graphic:
+    function ~/../common
+    if G_ENVIRONMENT.name == "summit": 
+        tag @s add summit.static
+
+    Self = Data.entity("@s")
+    TempStorage = Data.storage(reef.zzzinternals:tmp).root
+    ElementData = TempStorage.element.data
+
+    Self.item.id = "minecraft:amethyst_shard"
+    Self.item.components."minecraft:item_model" = ElementData.model
+
+    DEV_LOGGER.info("@a", "DISPLAYING GRAPHIC ELEMENT")
+
+function ~/screen/display/animated_graphic:
+    function ~/../common
+
+    Self = Data.entity("@s")
+    TempStorage = Data.storage(reef.zzzinternals:tmp).root
+    ElementData = TempStorage.element.data
+    CurrentFrame = Scoreboard.objective("reef.zzzinternals.element.animated_graphic.current_frame")
+    Frames = Scoreboard.objective("reef.zzzinternals.element.animated_graphic.frames")
+
+    Self.text = {
+        text: "0",
+        font: "default", # should be ElementData.font
+        shadow_color: 0
+    }
+    Self.background = 0
+
+    CurrentFrame["@s"] = 0
+    Frames["@s"] = ElementData.frames
+
+    DEV_LOGGER.info("@a", "DISPLAYING ANIMATED GRAPHIC ELEMENT")
+
+    function ~/animate:
+        ...
 
 function ~/screen/is_current_sequence_finished:
     execute if data entity @s data.reef.screen.slideshow.current.page_data.sequence[0] run return fail
