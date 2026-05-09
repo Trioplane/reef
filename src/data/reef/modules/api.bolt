@@ -26,3 +26,34 @@ function ~/screen/summon:
 
     LOGGER.info("@a[tag=reef.permissions.see_debug]", "Screen summoned!")
     LOGGER.info("@a[tag=reef.permissions.see_debug]", "To rotate the screen, modify the `Rotation` tag instead of `transformation`.")
+
+function ~/screen/set_page:
+    scoreboard players set @s reef.zzzinternals.screen.slideshow.switch_to_page $(page)
+    function reef:zzzinternals/screen/load_page
+
+    function ~/first_page:
+        LOGGER.info("@a[tag=reef.permissions.see_debug]", ["This is the first page of the slideshow."])
+
+    function ~/last_page:
+        LOGGER.info("@a[tag=reef.permissions.see_debug]", ["This is the last page of the slideshow."])
+
+function ~/screen/next:
+    execute unless function reef:zzzinternals/screen/is_current_sequence_finished run return:
+        DEV_LOGGER.info("@a", "not finished... advancing sequence")
+        function reef:zzzinternals/screen/advance_page_sequence
+
+    DEV_LOGGER.info("@a", "finished... going to next page")
+    scoreboard players add @s reef.zzzinternals.screen.slideshow.switch_to_page 1
+
+    execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/../set_page/first_page
+    execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/../set_page/last_page
+    
+    function reef:zzzinternals/screen/load_page
+
+function ~/screen/prev:
+    scoreboard players remove @s reef.zzzinternals.screen.slideshow.switch_to_page 1
+
+    execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/../set_page/first_page
+    execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/../set_page/last_page
+    
+    function reef:zzzinternals/screen/load_page

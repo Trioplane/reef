@@ -37,6 +37,13 @@ class IDFunction:
         })
 
 function ~/load:
+    scoreboard objectives add reef.zzzinternals.screen.slideshow.current_page dummy
+    scoreboard objectives add reef.zzzinternals.screen.slideshow.switch_to_page dummy
+    scoreboard objectives add reef.zzzinternals.screen.slideshow.pages dummy
+    scoreboard objectives add reef.zzzinternals.screen.slideshow.transition.current_frame dummy
+    scoreboard objectives add reef.zzzinternals.screen.slideshow.transition.frames dummy
+    scoreboard objectives add reef.zzzinternals.screen.slideshow.transition.switch_frame dummy
+
     DEV_LOGGER.info("@a", "zzzinternals module loaded")
 
 function ~/register/slideshow:
@@ -70,10 +77,18 @@ function ~/register/transition:
 
 IDFunction("screen")
 function ~/screen/setup_entity:
+    tag @s add reef.entity
     tag @s add reef.screen
     if G_ENVIRONMENT.name == "summit": 
         tag @s add summit.static
     function reef:zzzinternals/id/screen
+
+    data modify entity @s data.reef.screen.slideshow.data set value []
+    data modify entity @s data.reef.screen.slideshow.current.page_number set value 0
+    data modify entity @s data.reef.screen.slideshow.current.page_data set value {}
+    data modify entity @s data.reef.screen.slideshow.current.element set value {}
+    #data modify entity @s data.reef.screen.slideshow.current.transition_data set value {}
+    #data modify entity @s data.reef.screen.slideshow.current.sequence_data set value {}
 
 function ~/screen/load_slideshow:
     """
@@ -107,6 +122,82 @@ function ~/screen/load_slideshow:
     DEV_LOGGER.info("@a", "=== unpacking finished :D")
 
     data modify entity @s data.reef.screen.slideshow.data set from storage reef.zzzinternals:tmp root.slideshow_data.unpacked
+    execute store result score @s reef.zzzinternals.screen.slideshow.pages run data get entity @s data.reef.screen.slideshow.data
+    scoreboard players set @s reef.zzzinternals.screen.slideshow.switch_to_page 0
+    function reef:zzzinternals/screen/load_page
+
     DEV_LOGGER.info("@a", "put unpacked slideshow to entity slideshow data")
     LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Successfuly loaded slideshow data to screen ID #", {score: {name: "@s", objective: "reef.zzzinternals.screen.id"}}])
-        
+
+function ~/screen/cut_to_page:
+    ...
+
+function ~/screen/transition_to_page:
+    ...
+
+function ~/screen/load_page:
+    """
+    Load the slideshow data for the page
+
+    Throws:
+        if page number is out of bounds.
+    """
+
+    function ~/errors/page_number_lt0:
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", "Slideshow page number cannot be less than 0")
+
+    function ~/errors/page_number_gtpages:
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Slideshow page number cannot exceed page count (", {score: {name: "@s", objective: "reef.zzzinternals.screen.slideshow.pages"}}, ")"])
+
+    execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/errors/page_number_lt0
+    execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/errors/page_number_gtpages
+
+    scoreboard players operation @s reef.zzzinternals.screen.slideshow.current_page = @s reef.zzzinternals.screen.slideshow.switch_to_page
+
+    # this wont happen if people dont mess with zzzinternal stuff, but still a good measure to put
+    execute if score @s reef.zzzinternals.screen.slideshow.current_page matches ..-1 run return run function ~/errors/page_number_lt0
+    execute if score @s reef.zzzinternals.screen.slideshow.current_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/errors/page_number_gtpages
+
+    execute store result entity @s data.reef.screen.slideshow.current.page_number int 1 run scoreboard players get @s reef.zzzinternals.screen.slideshow.current_page
+
+    # Put current page data into its respective fields
+    with entity @s data.reef.screen.slideshow.current:
+        data modify entity @s data.reef.screen.slideshow.current.page_data set from entity @s data.reef.screen.slideshow.data[$(page_number)]
+
+    execute store result score @s reef.zzzinternals.screen.slideshow.transition.frames run data get entity @s data.reef.screen.slideshow.current.page_data.transition.frames
+    execute store result score @s reef.zzzinternals.screen.slideshow.transition.switch_frame run data get entity @s data.reef.screen.slideshow.current.page_data.transition.switch_frame
+
+    DEV_LOGGER.warn("@a", "screen/load_page temporarily handles advancing page sequence")
+    DEV_LOGGER.warn("@a", "This should be moved to transition_to_page and cut_to_page")
+    function reef:zzzinternals/screen/advance_page_sequence
+
+    #data modify entity @s data.reef.screen.slideshow.current.transition_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
+    #data modify entity @s data.reef.screen.slideshow.current.sequence_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
+
+function ~/screen/advance_page_sequence:
+    """
+    Display the current element group and eat it to advance the element sequence
+    """
+
+    # recurse through the element group
+    # display each one
+    # eat the sequence
+
+    DEV_LOGGER.info("@a", "advancing page sequence...")
+
+    execute function ~/display_element_group:
+        execute unless data entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0] run return:
+            DEV_LOGGER.info("@a", "done displaying element group")
+
+        data modify entity @s data.reef.screen.slideshow.current.element set from entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0]
+        DEV_LOGGER.info("@a", ["DISPLAY ELEMENT: ", {entity: "@s", nbt: "data.reef.screen.slideshow.current.element.text"}])
+
+        data remove entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0]
+        function ~/../display_element_group
+
+    DEV_LOGGER.info("@a", "ate page sequence")
+    data remove entity @s data.reef.screen.slideshow.current.page_data.sequence[0]
+
+function ~/screen/is_current_sequence_finished:
+    execute if data entity @s data.reef.screen.slideshow.current.page_data.sequence[0] run return fail
+    return 1

@@ -11,7 +11,16 @@ function reef:tick:
     ...
 
 function reef:uninstall:
-    ...
+    data remove storage reef.zzzinternals:in register
+    data remove storage reef.zzzinternals:registry slideshow
+    data remove storage reef.zzzinternals:registry page
+    data remove storage reef.zzzinternals:registry transition
+    data remove storage reef.zzzinternals:tmp root
+    scoreboard objectives remove reef.zzzinternals.screen.id
+
+    kill @e[tag=reef.entity]
+
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", "Thanks for using Reef! All storages, scoreboards, and entities related to Reef have been deleted from your world. You can now delete the data pack file.")
 
 append function_tag minecraft:load {
     "values": [
