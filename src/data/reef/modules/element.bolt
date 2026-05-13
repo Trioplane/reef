@@ -1,0 +1,95 @@
+class Identifier:
+    def __init__(self, id):
+        namespace, path = id.split(":")
+        self.namespace = namespace
+        self.path = path
+        self.full = f"{self.namespace}:{self.path}"
+
+class ItemDisplayElement:
+    def __init__(self, id: str, texture: str, size: tuple[int, int]):
+        self.id = Identifier(id)
+        self.texture = Identifier(texture)
+        self.size = size
+        self.model_path = f"{self.id.namespace}:item/{self.id.path}"
+        self.texture_path = f"{self.texture.namespace}:item/{self.texture.path}"
+
+    def calculate_transformation_matrix(self):
+        offset = (
+            0.5 - self.size[0] / 16,
+            0.5 - self.size[1] / 16
+        )
+        return [
+            self.size[0], 0,            0, offset[0], 
+            0,            self.size[1], 0, offset[1], 
+            0,            0,            1,       0.5, 
+            0,            0,            0,       1
+        ]
+
+
+    def create_model(self):
+        model self.model_path ({
+        	"credit": "Generated with Reef",
+            "parent": "reef:element_base",
+        	"textures": {
+        		"image": self.texture_path,
+        	}
+        })
+
+        return self
+
+    def create_item_definition(self):
+        item_model self.id.full ({
+            "model": {
+                "type": "minecraft:model",
+                "model": self.model_path,
+                "transformation": self.calculate_transformation_matrix()
+            }
+        })
+
+        return self
+
+class GraphicElement(ItemDisplayElement):
+    pass
+
+class AnimatedGraphicElement(ItemDisplayElement):
+    def __init__(self, id, texture: str, size: tuple[int, int], frames):
+        super().__init__(id, texture, size)
+        self.frames = frames
+
+    def create_model(self):
+        for i in range(1, self.frames + 1):
+            model f"{self.model_path}/{i}" ({
+            	"credit": "Generated with Reef",
+                "parent": "reef:element_base",
+            	"textures": {
+            		"image": f"{self.texture_path}/{i}",
+            	}
+            })
+
+        return self
+
+    def create_item_definition(self):
+        entries = []
+        for i in range(1, self.frames + 1):
+            entries.append({
+                "threshold": i,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": f"{self.model_path}/{i}"
+                }
+            })
+        
+        item_model self.id.full ({
+            "model": {
+                "type": "minecraft:range_dispatch",
+                "property": "minecraft:custom_model_data",
+                "index": 0,
+                "entries": entries,
+                "transformation": self.calculate_transformation_matrix()
+            }
+        })
+
+        return self
+
+class TransitionElement(AnimatedGraphicElement):
+    pass

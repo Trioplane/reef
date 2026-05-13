@@ -59,3 +59,260 @@ function ~/screen/prev:
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/../set_page/last_page
     
     function reef:zzzinternals/screen/transition_to_page
+
+# REMOTE STUFF
+
+loot_table reef:remote {
+    "pools": [
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "minecraft:poisonous_potato",
+                    "functions": [
+                        {
+                            "function": "minecraft:set_components",
+                            "components": {
+                                "minecraft:item_name": {
+                                    "text": "Unlinked Remote",
+                                    "color": "light_purple"
+                                },
+                                "!minecraft:food": {},
+                                "minecraft:max_stack_size": 1,
+                                "minecraft:consumable": {
+                                    "consume_seconds": 9999999
+                                }
+                            }
+                        },
+                        {
+                            "function": "minecraft:set_custom_data",
+                            "tag": {
+                                "reef": {
+                                    "item": {
+                                        "id": "reef:remote",
+                                        "components": {
+                                            "reef:link": {
+                                                "linked": false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
+advancement reef:item/unlinked_remote/use {
+    "criteria": {
+        "use_item": {
+            "trigger": "using_item",
+            "conditions": {
+                "item": {
+                    "predicates": {
+                        "custom_data": {
+                            "reef": {
+                                "item": {
+                                    "id": "reef:remote",
+                                    "components": {
+                                        "reef:link": {
+                                            "linked": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+            }
+        }
+    },
+    "rewards": {
+        "function": "reef:api/remote/link"
+    }
+}
+
+advancement reef:item/linked_remote/primary_use {
+    "criteria": {
+        "use_item": {
+            "trigger": "using_item",
+            "conditions": {
+                "player": {
+                    "type_specific": {
+                        "type": "minecraft:player",
+                        "input": {
+                            "sneak": false,
+                            "sprint": false
+                        }
+                    }
+                },
+                "item": {
+                    "predicates": {
+                        "custom_data": {
+                            "reef": {
+                                "item": {
+                                    "id": "reef:remote",
+                                    "components": {
+                                        "reef:link": {
+                                            "linked": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "rewards": {
+        "function": "reef:api/remote/next"
+    }
+}
+
+advancement reef:item/linked_remote/secondary_use {
+    "criteria": {
+        "use_item": {
+            "trigger": "using_item",
+            "conditions": {
+                "player": {
+                    "type_specific": {
+                        "type": "minecraft:player",
+                        "input": {
+                            "sneak": true,
+                            "sprint": false
+                        }
+                    }
+                },
+                "item": {
+                    "predicates": {
+                        "custom_data": {
+                            "reef": {
+                                "item": {
+                                    "id": "reef:remote",
+                                    "components": {
+                                        "reef:link": {
+                                            "linked": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "rewards": {
+        "function": "reef:api/remote/prev"
+    }
+}
+
+advancement reef:item/linked_remote/tertiary_use {
+    "criteria": {
+        "use_item": {
+            "trigger": "using_item",
+            "conditions": {
+                "player": {
+                    "type_specific": {
+                        "type": "minecraft:player",
+                        "input": {
+                            "sneak": true,
+                            "sprint": true
+                        }
+                    }
+                },
+                "item": {
+                    "predicates": {
+                        "custom_data": {
+                            "reef": {
+                                "item": {
+                                    "id": "reef:remote",
+                                    "components": {
+                                        "reef:link": {
+                                            "linked": true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "rewards": {
+        "function": "reef:api/remote/open_slideshow_settings"
+    }
+}
+
+function ~/remote/link:
+    advancement revoke @s only reef:item/unlinked_remote/use
+
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
+
+    execute unless items entity @s weapon.mainhand *[custom_data~{reef:{item:{id:"reef:remote",components:{"reef:link":{linked: false}}}}}] run return:
+        LOGGER.error("@s", "You can only perform this action when holding an unlinked Reef remote on your weapon.mainhand slot.")
+
+    dialog show @s {
+        "type": "minecraft:multi_action",
+        "title": {
+            "text": "Reef",
+            "color": "gray",
+            "italic": true
+        },
+        "body": {
+            "type": "minecraft:plain_message",
+            "contents": {
+                "text": "Link this remote to a screen"
+            }
+        },
+        "inputs": [
+            {
+                "type": "minecraft:text",
+                "key": "id",
+                "width": 100,
+                "label": {
+                    "text": "Screen ID",
+                    "color": "gray",
+                    "italic": true
+                },
+                "max_length": 5
+            }
+        ],
+        "pause": false,
+        "actions": [
+            {
+                "label": {
+                    "text": "Link",
+                    "color": "light_purple",
+                    "bold": true
+                },
+                "width": 40,
+                "action": {
+                    "type": "minecraft:dynamic/run_command",
+                    "template": "function reef:zzzinternals/remote/link {id: $(id)}"
+                }
+            }
+        ]
+    }
+
+function ~/remote/next:
+    advancement revoke @s only reef:item/linked_remote/primary_use
+    DEV_LOGGER.info("@a", "~/remote/next")
+
+function ~/remote/prev:
+    advancement revoke @s only reef:item/linked_remote/secondary_use
+    DEV_LOGGER.info("@a", "~/remote/prev")
+
+function ~/remote/open_slideshow_settings:
+    advancement revoke @s only reef:item/linked_remote/tertiary_use
+    DEV_LOGGER.info("@a", "~/remote/open_slideshow_settings")
+
+function ~/screen/load_slideshow:
+    ...
