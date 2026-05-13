@@ -96,7 +96,16 @@ function ~/load:
     scoreboard objectives add reef.zzzinternals.element.animated_graphic.current_frame dummy
     scoreboard objectives add reef.zzzinternals.element.animated_graphic.frames dummy
 
+    scoreboard objectives add reef.zzzinternals.element.transition.current_frame dummy
+    scoreboard objectives add reef.zzzinternals.element.transition.switch_frame dummy
+    scoreboard objectives add reef.zzzinternals.element.transition.frames dummy
+
     DEV_LOGGER.info("@a", "zzzinternals module loaded")
+
+function ~/tick:
+    execute as @e[type=text_display,tag=reef.element.animated_graphic,tag=!reef.element.animated_graphic.finished] run function reef:zzzinternals/screen/display/animated_graphic/animate
+    execute as @e[type=text_display,tag=reef.element.transition,tag=!reef.element.transition.finished] run function reef:zzzinternals/screen/display/transition/animate
+    execute as @e[type=item_display,tag=reef.screen,tag=!reef.screen.transition.finished] run function reef:zzzinternals/screen/transition_to_page/listen_for_switch_frame
 
 function ~/register/slideshow:
     # @args (identifier, storage_path)
@@ -125,6 +134,13 @@ function ~/register/transition:
     $data remove storage reef.zzzinternals:registry transition."$(identifier)"
     $data modify storage reef.zzzinternals:registry transition."$(identifier)" set from storage $(storage_path)
     LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Transition data ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}])
+
+function ~/register/keyword/transition/none:
+    data remove storage reef.zzzinternals:registry transition."none"
+    data modify storage reef.zzzinternals:registry transition."none" set value {
+        _skip: true
+    }
+    DEV_LOGGER.info("@a", "KEYWORD 'none' REGISTERED")
 # ------------------------------
 
 IDFunction("screen")
@@ -135,10 +151,22 @@ function ~/screen/setup_entity:
         tag @s add summit.static
     function reef:zzzinternals/id/screen
 
+    rotate @s ~ ~
+
     data modify entity @s data.reef.screen.slideshow.data set value []
     data modify entity @s data.reef.screen.slideshow.current.page_number set value 0
     data modify entity @s data.reef.screen.slideshow.current.page_data set value {}
     data modify entity @s data.reef.screen.slideshow.current.element set value {}
+
+    execute at @s summon text_display run function reef:zzzinternals/screen/display/transition/setup
+    ParentID = Scoreboard.objective("reef.zzzinternals.parent.screen.id")
+    ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+    ParentID["@n[type=text_display,tag=reef.element.transition,tag=reef.element.new]"] = ScreenID["@s"]
+    tag @n[type=text_display,tag=reef.element.transition,tag=reef.element.new] remove reef.element.new
+
+    # stop from transitioning immediately
+    tag @s add reef.screen.transition.finished
+
     #data modify entity @s data.reef.screen.slideshow.current.transition_data set value {}
     #data modify entity @s data.reef.screen.slideshow.current.sequence_data set value {}
 
@@ -176,18 +204,46 @@ function ~/screen/load_slideshow:
     data modify entity @s data.reef.screen.slideshow.data set from storage reef.zzzinternals:tmp root.slideshow_data.unpacked
     execute store result score @s reef.zzzinternals.screen.slideshow.pages run data get entity @s data.reef.screen.slideshow.data
     scoreboard players set @s reef.zzzinternals.screen.slideshow.switch_to_page 0
-    function reef:zzzinternals/screen/cut_to_page
+    function reef:zzzinternals/screen/transition_to_page
 
     DEV_LOGGER.info("@a", "put unpacked slideshow to entity slideshow data")
     LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Successfuly loaded slideshow data to screen ID #", {score: {name: "@s", objective: "reef.zzzinternals.screen.id"}}])
 
 function ~/screen/cut_to_page:
+    # this assumes the page is already loaded in
     function reef:zzzinternals/screen/thy_shall_kill_elements
-    function reef:zzzinternals/screen/load_page
     function reef:zzzinternals/screen/advance_page_sequence
 
 function ~/screen/transition_to_page:
-    ...
+    function reef:zzzinternals/screen/load_page
+
+    Self = Data.entity("@s")
+    TempStorage = Data.storage(reef.zzzinternals:tmp).root
+    CurrentFrame = Scoreboard.objective("reef.zzzinternals.element.transition.current_frame")
+    SwitchFrame = Scoreboard.objective("reef.zzzinternals.element.transition.switch_frame")
+    Frames = Scoreboard.objective("reef.zzzinternals.element.transition.frames")
+
+    TempStorage.transition = Self.data.reef.screen.slideshow.current.page_data.transition
+
+    if TempStorage.transition._skip == True:
+        DEV_LOGGER.info("@a", "transition is NONE... skipping...")
+        return run function reef:zzzinternals/screen/cut_to_page
+
+    tag @s remove reef.screen.transition.finished
+    CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")
+    ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+    CompareValue[".compare_value"] = ScreenID["@s"]
+    execute as @n[type=text_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen] function reef:zzzinternals/screen/display/transition/restart
+    DEV_LOGGER.info("@a", ["RUNNING TRANSITION ", {storage: "reef.zzzinternals:tmp", nbt: "root.transition.font"}])
+
+    function ~/listen_for_switch_frame:
+        CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")
+        ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+        CompareValue[".compare_value"] = ScreenID["@s"]
+        execute if function reef:zzzinternals/screen/display/transition/is_switch_frame:
+            DEV_LOGGER.info("@a", "SWITCHING PAGE!!")
+            function reef:zzzinternals/screen/cut_to_page
+            tag @s add reef.screen.transition.finished
 
 function ~/screen/load_page:
     """
@@ -227,10 +283,10 @@ function ~/screen/load_page:
     #data modify entity @s data.reef.screen.slideshow.current.sequence_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
 
 function ~/screen/thy_shall_kill_elements:
-    CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")[".compare_value"]
+    CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")
     ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
-    CompareValue = ScreenID["@s"]
-    kill @e[type=#reef:zzzinternals/screen_display,predicate=reef:zzzinternals/id_link/parent/screen]
+    CompareValue[".compare_value"] = ScreenID["@s"]
+    kill @e[type=#reef:zzzinternals/screen_display,tag=!reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]
 
 function ~/screen/advance_page_sequence:
     """
@@ -303,6 +359,7 @@ function ~/screen/display/common:
 
 function ~/screen/display/text:
     function ~/../common
+    tag @s add reef.element.text
     if G_ENVIRONMENT.name == "summit": 
         tag @s add summit.static
 
@@ -323,6 +380,7 @@ function ~/screen/display/text:
 
 function ~/screen/display/graphic:
     function ~/../common
+    tag @s add reef.element.graphic
     if G_ENVIRONMENT.name == "summit": 
         tag @s add summit.static
 
@@ -337,6 +395,7 @@ function ~/screen/display/graphic:
 
 function ~/screen/display/animated_graphic:
     function ~/../common
+    tag @s add reef.element.animated_graphic
 
     Self = Data.entity("@s")
     TempStorage = Data.storage(reef.zzzinternals:tmp).root
@@ -345,20 +404,112 @@ function ~/screen/display/animated_graphic:
     Frames = Scoreboard.objective("reef.zzzinternals.element.animated_graphic.frames")
 
     Self.text = {
-        text: "0",
-        font: "default", # should be ElementData.font
+        text: "",
+        font: ElementData.font,
         shadow_color: 0
     }
     Self.background = 0
 
-    CurrentFrame["@s"] = 0
+    CurrentFrame["@s"] = 1
     Frames["@s"] = ElementData.frames
 
     DEV_LOGGER.info("@a", "DISPLAYING ANIMATED GRAPHIC ELEMENT")
 
     function ~/animate:
-        ...
+        DEV_LOGGER.info("@a", "animating animated graphic...")
+        TempStorage.element.animated_graphic.current_frame = CurrentFrame["@s"]
+        execute function ~/change_text:
+            execute if score @s reef.zzzinternals.element.animated_graphic.current_frame matches 0..9 run return run function reef:zzzinternals/util/change_text_1_digit with var TempStorage.element.animated_graphic
+            execute if score @s reef.zzzinternals.element.animated_graphic.current_frame matches 10..99 run return run function reef:zzzinternals/util/change_text_2_digit with var TempStorage.element.animated_graphic
+            execute if score @s reef.zzzinternals.element.animated_graphic.current_frame matches 100..999 run return run function reef:zzzinternals/util/change_text_3_digit with var TempStorage.element.animated_graphic
+
+        if CurrentFrame["@s"] >= Frames["@s"]:
+            return:
+                tag @s add reef.element.animated_graphic.finished
+
+        CurrentFrame["@s"] += 1
+
+function ~/screen/display/transition/:
+    Self = Data.entity("@s")
+    TempStorage = Data.storage(reef.zzzinternals:tmp).root
+    TransitionData = TempStorage.transition
+    CurrentFrame = Scoreboard.objective("reef.zzzinternals.element.transition.current_frame")
+    SwitchFrame = Scoreboard.objective("reef.zzzinternals.element.transition.switch_frame")
+    Frames = Scoreboard.objective("reef.zzzinternals.element.transition.frames")
+
+    function ~/setup:
+        tag @s add reef.entity
+        tag @s add reef.element
+        tag @s add reef.element.new
+        tag @s add reef.element.transition
+
+        Self = Data.entity("@s")
+        TempStorage = Data.storage(reef.zzzinternals:tmp).root
+        TransitionData = TempStorage.transition
+        CurrentFrame = Scoreboard.objective("reef.zzzinternals.element.transition.current_frame")
+        SwitchFrame = Scoreboard.objective("reef.zzzinternals.element.transition.switch_frame")
+        Frames = Scoreboard.objective("reef.zzzinternals.element.transition.frames")
+
+        Self.text = {
+            text: "",
+            font: TransitionData.font,
+            shadow_color: 0
+        }
+        Self.background = 0
+        Self.brightness = {block: 15, sky: 15}
+
+        rotate @s ~ ~
+        tp @s ^ ^ ^0.1
+
+        # stop running immediately after setup
+        tag @s add reef.element.transition.finished
+
+        DEV_LOGGER.info("@a", "DISPLAYING TRANSITION ELEMENT")
+
+    function ~/animate:
+        DEV_LOGGER.info("@a", "animating transition...")
+        TempStorage.element.transition.current_frame = CurrentFrame["@s"]
+        execute function ~/change_text:
+            execute if score @s reef.zzzinternals.element.transition.current_frame matches 0..9 run return run function reef:zzzinternals/util/change_text_1_digit with var TempStorage.element.transition
+            execute if score @s reef.zzzinternals.element.transition.current_frame matches 10..99 run return run function reef:zzzinternals/util/change_text_2_digit with var TempStorage.element.transition
+            execute if score @s reef.zzzinternals.element.transition.current_frame matches 100..999 run return run function reef:zzzinternals/util/change_text_3_digit with var TempStorage.element.transition
+
+        if CurrentFrame["@s"] >= Frames["@s"]:
+            return:
+                DEV_LOGGER.info("@a", "finished transition :D")
+                tag @s add reef.element.transition.finished
+
+        CurrentFrame["@s"] += 1
+
+    function ~/load_transition:
+        CurrentFrame["@s"] = 1
+        SwitchFrame["@s"] = TransitionData.switch_frame
+        Frames["@s"] = TransitionData.frames
+        Self.text.font = TransitionData.font
+        Self.transformation.translation = TransitionData.translation
+        Self.transformation.scale = TransitionData.scale
+        Self.transformation.left_rotation = TransitionData.left_rotation
+        Self.transformation.right_rotation = TransitionData.right_rotation
+
+    function ~/restart:
+        tag @s remove reef.element.transition.finished
+        function ~/../load_transition
+
+    function ~/is_switch_frame:
+        # RUN AS SCREEN
+        if CurrentFrame["@n[type=text_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"] >= SwitchFrame["@n[type=text_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"]:
+            return 1
+        return fail
 
 function ~/screen/is_current_sequence_finished:
     execute if data entity @s data.reef.screen.slideshow.current.page_data.sequence[0] run return fail
     return 1
+
+function ~/util/change_text_1_digit:
+    $data modify entity @s text.text set value "\uE00$(current_frame)"
+
+function ~/util/change_text_2_digit:
+    $data modify entity @s text.text set value "\uE0$(current_frame)"
+
+function ~/util/change_text_3_digit:
+    $data modify entity @s text.text set value "\uE$(current_frame)"

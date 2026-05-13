@@ -1,0 +1,16 @@
+{
+	"credit": "github.com/Trioplane/reef",
+	"ambientocclusion": false,
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [1, 1, 0],
+			"shade": false,
+			"light_emission": 15,
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 0]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#image"}
+			}
+		}
+	]
+}

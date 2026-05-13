@@ -29,7 +29,7 @@ function ~/screen/summon:
 
 function ~/screen/set_page:
     scoreboard players set @s reef.zzzinternals.screen.slideshow.switch_to_page $(page)
-    function reef:zzzinternals/screen/cut_to_page
+    function reef:zzzinternals/screen/transition_to_page
 
     function ~/first_page:
         scoreboard players operation @s reef.zzzinternals.screen.slideshow.switch_to_page = @s reef.zzzinternals.screen.slideshow.current_page
@@ -50,7 +50,7 @@ function ~/screen/next:
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/../set_page/first_page
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/../set_page/last_page
     
-    function reef:zzzinternals/screen/cut_to_page
+    function reef:zzzinternals/screen/transition_to_page
 
 function ~/screen/prev:
     scoreboard players remove @s reef.zzzinternals.screen.slideshow.switch_to_page 1
@@ -58,4 +58,4 @@ function ~/screen/prev:
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/../set_page/first_page
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/../set_page/last_page
     
-    function reef:zzzinternals/screen/cut_to_page
+    function reef:zzzinternals/screen/transition_to_page
