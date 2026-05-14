@@ -1,8 +1,16 @@
 from reef:main import LOGGER
 from reef:main import DEV_LOGGER
+from bolt_expressions import Scoreboard, Data
 
 function ~/load:
     DEV_LOGGER.info("@a", "api module loaded")
+
+function ~/tick:
+    tag @a[advancements={reef:item/unlinked_remote/use=false},tag=reef.item.unlinked_remote.clicked_this_tick] remove reef.item.unlinked_remote.clicked_this_tick
+    advancement revoke @a only reef:item/unlinked_remote/use
+
+    tag @a[advancements={reef:item/linked_remote/use=false},tag=reef.item.linked_remote.clicked_this_tick] remove reef.item.linked_remote.clicked_this_tick
+    advancement revoke @a only reef:item/linked_remote/use
 
 function ~/register/slideshow:
     $data modify storage reef.zzzinternals:in register.slideshow set value {identifier: '$(identifier)', storage_path: '$(storage_path)'}
@@ -106,7 +114,6 @@ loot_table reef:remote {
         }
     ]
 }
-
 advancement reef:item/unlinked_remote/use {
     "criteria": {
         "use_item": {
@@ -132,24 +139,14 @@ advancement reef:item/unlinked_remote/use {
         }
     },
     "rewards": {
-        "function": "reef:api/remote/link"
+        "function": "reef:api/remote/unlinked_remote/listener"
     }
 }
-
-advancement reef:item/linked_remote/primary_use {
+advancement reef:item/linked_remote/use {
     "criteria": {
         "use_item": {
             "trigger": "using_item",
             "conditions": {
-                "player": {
-                    "type_specific": {
-                        "type": "minecraft:player",
-                        "input": {
-                            "sneak": false,
-                            "sprint": false
-                        }
-                    }
-                },
                 "item": {
                     "predicates": {
                         "custom_data": {
@@ -170,89 +167,63 @@ advancement reef:item/linked_remote/primary_use {
         }
     },
     "rewards": {
-        "function": "reef:api/remote/next"
+        "function": "reef:api/remote/linked_remote/listener"
     }
 }
-
-advancement reef:item/linked_remote/secondary_use {
-    "criteria": {
-        "use_item": {
-            "trigger": "using_item",
-            "conditions": {
-                "player": {
-                    "type_specific": {
-                        "type": "minecraft:player",
-                        "input": {
-                            "sneak": true,
-                            "sprint": false
-                        }
-                    }
-                },
-                "item": {
-                    "predicates": {
-                        "custom_data": {
-                            "reef": {
-                                "item": {
-                                    "id": "reef:remote",
-                                    "components": {
-                                        "reef:link": {
-                                            "linked": true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+predicate reef:item/linked_remote/use_type/primary {
+    "condition": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+        "type_specific": {
+            "type": "minecraft:player",
+            "input": {
+                "sneak": false,
+                "sprint": false
             }
         }
-    },
-    "rewards": {
-        "function": "reef:api/remote/prev"
     }
 }
-
-advancement reef:item/linked_remote/tertiary_use {
-    "criteria": {
-        "use_item": {
-            "trigger": "using_item",
-            "conditions": {
-                "player": {
-                    "type_specific": {
-                        "type": "minecraft:player",
-                        "input": {
-                            "sneak": true,
-                            "sprint": true
-                        }
-                    }
-                },
-                "item": {
-                    "predicates": {
-                        "custom_data": {
-                            "reef": {
-                                "item": {
-                                    "id": "reef:remote",
-                                    "components": {
-                                        "reef:link": {
-                                            "linked": true
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+predicate reef:item/linked_remote/use_type/secondary {
+    "condition": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+        "type_specific": {
+            "type": "minecraft:player",
+            "input": {
+                "sneak": true,
+                "sprint": false
             }
         }
-    },
-    "rewards": {
-        "function": "reef:api/remote/open_slideshow_settings"
+    }
+}
+predicate reef:item/linked_remote/use_type/tertiary {
+    "condition": "minecraft:entity_properties",
+    "entity": "this",
+    "predicate": {
+        "type_specific": {
+            "type": "minecraft:player",
+            "input": {
+                "sneak": true,
+                "sprint": true
+            }
+        }
     }
 }
 
-function ~/remote/link:
-    advancement revoke @s only reef:item/unlinked_remote/use
+function ~/remote/linked_remote/listener:
+    execute as @s[tag=!reef.item.linked_remote.clicked_this_tick]:
+        execute if predicate reef:item/linked_remote/use_type/primary run return run function reef:api/remote/linked_remote/next
+        execute if predicate reef:item/linked_remote/use_type/secondary run return run function reef:api/remote/linked_remote/prev
+        execute if predicate reef:item/linked_remote/use_type/tertiary run return run function reef:api/remote/linked_remote/open_slideshow_settings
+        
+    tag @s add reef.item.linked_remote.clicked_this_tick
 
+function ~/remote/unlinked_remote/listener:
+    execute as @s[tag=!reef.item.unlinked_remote.clicked_this_tick] run function ~/../link
+        
+    tag @s add reef.item.unlinked_remote.clicked_this_tick
+
+function ~/remote/unlinked_remote/link:
     execute if entity @s[tag=!reef.permissions.use_remote] run return:
         LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
 
@@ -302,16 +273,50 @@ function ~/remote/link:
         ]
     }
 
-function ~/remote/next:
-    advancement revoke @s only reef:item/linked_remote/primary_use
+InStorage = Data.storage(reef.zzzinternals:in)
+LinkedRemoteData = InStorage.remote.linked_remote
+
+function ~/remote/linked_remote/load_remote_data:
+    """
+        Store the linked remote data held in weapon.mainhand to in storage
+    """
+    execute unless items entity @s weapon.mainhand *[custom_data~{reef:{item:{id:"reef:remote",components:{"reef:link":{linked: true}}}}}] run return:
+        LOGGER.error("@s", "You can only perform this action when holding a linked Reef remote on your weapon.mainhand slot.")
+
+    summon item_display ~ ~ ~ {
+        Tags: ["summit.static", "reef.item_store.linked_remote.temp", "reef.entity"],
+        transformation: [
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 1
+        ]
+    }
+    item replace entity @n[type=item_display,tag=reef.item_store.linked_remote.temp] contents from entity @s weapon.mainhand
+    LinkedRemoteData = Data.entity("@n[type=item_display,tag=reef.item_store.linked_remote.temp]").item.components."minecraft:custom_data".reef.item.components."reef:link"
+    kill @n[type=item_display,tag=reef.item_store.linked_remote.temp]
+
+function ~/remote/linked_remote/prepare_screen_link:
+    IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
+    ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+    IDLink[".compare_value"] = LinkedRemoteData.id
+
+function ~/remote/linked_remote/next:
+    function ~/../load_remote_data
+    function ~/../prepare_screen_link
+    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/next
     DEV_LOGGER.info("@a", "~/remote/next")
 
-function ~/remote/prev:
-    advancement revoke @s only reef:item/linked_remote/secondary_use
+function ~/remote/linked_remote/prev:
+    function ~/../load_remote_data
+    function ~/../prepare_screen_link
+    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/prev
     DEV_LOGGER.info("@a", "~/remote/prev")
 
-function ~/remote/open_slideshow_settings:
-    advancement revoke @s only reef:item/linked_remote/tertiary_use
+function ~/remote/linked_remote/open_slideshow_settings:
+    function ~/../load_remote_data
+    function ~/../prepare_screen_link
+    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run say i got opened
     DEV_LOGGER.info("@a", "~/remote/open_slideshow_settings")
 
 function ~/screen/load_slideshow:

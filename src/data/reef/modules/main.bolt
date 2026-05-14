@@ -8,6 +8,7 @@ function reef:load:
     LOGGER.info("@a[tag=reef.permissions.see_debug]", f"Loaded! (version {ctx.project_version})")
 
 function reef:tick:
+    function reef:api/tick
     function reef:zzzinternals/tick
 
 function reef:uninstall:

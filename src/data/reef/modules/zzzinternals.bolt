@@ -115,7 +115,6 @@ function ~/register/slideshow:
 
     $data remove storage reef.zzzinternals:registry slideshow."$(identifier)"
     $data modify storage reef.zzzinternals:registry slideshow."$(identifier)" set from storage $(storage_path)
-    $data modify storage reef.zzzinternals:registry slideshow_list append value "$(identifier)"
     LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Slideshow data ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.identifier"}])
 
 function ~/register/page:
@@ -285,9 +284,9 @@ function ~/screen/load_page:
     #data modify entity @s data.reef.screen.slideshow.current.sequence_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
 
 function ~/screen/thy_shall_kill_elements:
-    CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")
+    IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
     ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
-    CompareValue[".compare_value"] = ScreenID["@s"]
+    IDLink[".compare_value"] = ScreenID["@s"]
     kill @e[type=#reef:zzzinternals/screen_display,tag=!reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]
 
 function ~/screen/advance_page_sequence:
