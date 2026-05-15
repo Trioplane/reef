@@ -457,7 +457,6 @@ function ~/remote/linked_remote/open_slideshow_settings:
         ]
     }
 
-    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run say i got opened
     DEV_LOGGER.info("@a", "~/remote/open_slideshow_settings")
 
     function ~/open_load_slideshow_dialog:
