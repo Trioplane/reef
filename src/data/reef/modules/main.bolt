@@ -5,7 +5,7 @@ function reef:load:
     function reef:api/load
     function reef:zzzinternals/load
 
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", f"Loaded! (version {ctx.project_version})")
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", f"Loaded! (version {ctx.project_version} [{G_ENVIRONMENT.name}])")
 
 function reef:tick:
     function reef:api/tick

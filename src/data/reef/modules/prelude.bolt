@@ -50,6 +50,6 @@ class Logger:
 G_ENVIRONMENT_TYPES = {
     "development": Environment(name="development", options=EnvironmentOptions(dev_logs=True)),
     "production": Environment(name="production", options=EnvironmentOptions(dev_logs=False)),
-    "summit": Environment(name="summit", options=EnvironmentOptions(dev_logs=true))
+    "summit": Environment(name="summit", options=EnvironmentOptions(dev_logs=False))
 }
-G_ENVIRONMENT = G_ENVIRONMENT_TYPES.development
+G_ENVIRONMENT = G_ENVIRONMENT_TYPES.production
