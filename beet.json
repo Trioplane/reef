@@ -2,7 +2,7 @@
     "author": "Trplnr",
     "name": "Reef",
     "description": "Create stunning presentations completely in vanilla Minecraft: Java Edition",
-    "version": "1.0.0-alpha8",
+    "version": "1.0.0-alpha9",
     "minecraft": "26.1",
     "data_pack": {
         "load": ["src"],

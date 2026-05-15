@@ -6,11 +6,11 @@ function ~/load:
     DEV_LOGGER.info("@a", "api module loaded")
 
 function ~/tick:
-    tag @a[advancements={reef:item/unlinked_remote/use=false},tag=reef.item.unlinked_remote.clicked_this_tick] remove reef.item.unlinked_remote.clicked_this_tick
-    advancement revoke @a only reef:item/unlinked_remote/use
-
     tag @a[advancements={reef:item/linked_remote/use=false},tag=reef.item.linked_remote.clicked_this_tick] remove reef.item.linked_remote.clicked_this_tick
     advancement revoke @a only reef:item/linked_remote/use
+
+    tag @a[advancements={reef:item/unlinked_remote/use=false},tag=reef.item.unlinked_remote.clicked_this_tick] remove reef.item.unlinked_remote.clicked_this_tick
+    advancement revoke @a only reef:item/unlinked_remote/use
 
 function ~/register/slideshow:
     $data modify storage reef.zzzinternals:in register.slideshow set value {identifier: '$(identifier)', storage_path: '$(storage_path)'}
@@ -86,6 +86,7 @@ loot_table reef:remote {
                                     "text": "Unlinked Remote",
                                     "color": "light_purple"
                                 },
+                                "minecraft:item_model": "reef:remote",
                                 "!minecraft:food": {},
                                 "minecraft:max_stack_size": 1,
                                 "minecraft:consumable": {
@@ -114,6 +115,40 @@ loot_table reef:remote {
         }
     ]
 }
+item_modifier reef:item/remote/convert_to_unlinked_remote [
+    {
+        "function": "minecraft:set_components",
+        "components": {
+            "minecraft:item_name": [
+                "",
+                {
+                    "text": "Unlinked Remote",
+                    "color": "light_purple"
+                }
+            ],
+            "minecraft:item_model": "reef:remote",
+            "!minecraft:food": {},
+            "minecraft:max_stack_size": 1,
+            "minecraft:consumable": {
+                "consume_seconds": 9999999
+            }
+        }
+    },
+    {
+        "function": "minecraft:set_custom_data",
+        "tag": {
+            "reef": {
+                "item": {
+                    "components": {
+                        "reef:link": {
+                            "linked": false
+                        }
+                    }
+                }
+            }
+        }
+    }
+]
 advancement reef:item/unlinked_remote/use {
     "criteria": {
         "use_item": {
@@ -301,23 +336,221 @@ function ~/remote/linked_remote/prepare_screen_link:
     ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
     IDLink[".compare_value"] = LinkedRemoteData.id
 
+    execute unless entity @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run return:
+        LOGGER.error("@s", "This screen doesn't exist! It may have been removed.")
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", [{selector: "@s"}, " tried to use a linked remote to a screen that doesn't exist."])
+        return fail
+    return 1
+
 function ~/remote/linked_remote/next:
     function ~/../load_remote_data
-    function ~/../prepare_screen_link
+    execute unless function ~/../prepare_screen_link run return fail
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/next
     DEV_LOGGER.info("@a", "~/remote/next")
 
 function ~/remote/linked_remote/prev:
     function ~/../load_remote_data
-    function ~/../prepare_screen_link
+    execute unless function ~/../prepare_screen_link run return fail
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/prev
     DEV_LOGGER.info("@a", "~/remote/prev")
 
 function ~/remote/linked_remote/open_slideshow_settings:
-    function ~/../load_remote_data
-    function ~/../prepare_screen_link
+    dialog show @s {
+        "type": "minecraft:multi_action",
+        "title": {
+            "text": "Reef",
+            "color": "gray",
+            "italic": true
+        },
+        "body": {
+            "type": "minecraft:plain_message",
+            "contents": {
+                "text": "Screen Options"
+            }
+        },
+        "pause": false,
+        "columns": 1,
+        "actions": [
+            {
+                "label": {
+                    "text": "Load slideshow",
+                    "color": "aqua"
+                },
+                "width": 100,
+                "action": {
+                    "type": "minecraft:run_command",
+                    "command": "function reef:api/remote/linked_remote/open_slideshow_settings/open_load_slideshow_dialog"
+                }
+            },
+            {
+                "label": {
+                    "text": "Change page",
+                    "color": "aqua"
+                },
+                "width": 100,
+                "action": {
+                    "type": "minecraft:run_command",
+                    "command": "function reef:api/remote/linked_remote/open_slideshow_settings/open_change_page_dialog"
+                }
+            },
+            {
+                "label": {
+                    "text": "Clear screen",
+                    "color": "aqua"
+                },
+                "tooltip": {
+                    "text": "This will remove all elements currently displayed on the linked screen",
+                    "color": "red"
+                },
+                "width": 100,
+                "action": {
+                    "type": "minecraft:run_command",
+                    "command": "function reef:api/remote/linked_remote/clear_screen"
+                }
+            },
+            {
+                "label": {
+                    "text": "Remove screen",
+                    "color": "red"
+                },
+                "tooltip": {
+                    "text": "This will remove the screen completely",
+                    "color": "red"
+                },
+                "width": 100,
+                "action": {
+                    "type": "minecraft:run_command",
+                    "command": "function reef:api/remote/linked_remote/remove_screen"
+                }
+            }
+        ]
+    }
+
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run say i got opened
     DEV_LOGGER.info("@a", "~/remote/open_slideshow_settings")
 
-function ~/screen/load_slideshow:
-    ...
+    function ~/open_load_slideshow_dialog:
+        dialog show @s {
+            "type": "minecraft:multi_action",
+            "title": {
+                "text": "Reef",
+                "color": "gray",
+                "italic": true
+            },
+            "body": {
+                "type": "minecraft:plain_message",
+                "contents": {
+                    "text": "Load a slideshow to the linked screen"
+                }
+            },
+            "inputs": [
+                {
+                    "type": "minecraft:text",
+                    "key": "id",
+                    "width": 100,
+                    "label": {
+                        "text": "Slideshow Identifier",
+                        "color": "gray",
+                        "italic": true,
+                        "hover_event": {
+                            "action": "show_text",
+                            "value": [
+                                "Example: `ns:my_slideshow`\n",
+                                {"text": "Do not input a single quote (') character", color: "red"}
+                            ]
+                        }
+                    }
+                }
+            ],
+            "pause": false,
+            "actions": [
+                {
+                    "label": {
+                        "text": "Load",
+                        "color": "light_purple",
+                        "bold": true
+                    },
+                    "width": 40,
+                    "action": {
+                        "type": "minecraft:dynamic/run_command",
+                        "template": "function reef:api/remote/linked_remote/load_slideshow {id: '$(id)'}"
+                    }
+                }
+            ]
+        }
+
+    function ~/open_change_page_dialog:
+        dialog show @s {
+            "type": "minecraft:multi_action",
+            "title": {
+                "text": "Reef",
+                "color": "gray",
+                "italic": true
+            },
+            "body": {
+                "type": "minecraft:plain_message",
+                "contents": {
+                    "text": "Change the linked screen's current page"
+                }
+            },
+            "inputs": [
+                {
+                    "type": "minecraft:text",
+                    "key": "index",
+                    "width": 100,
+                    "label": {
+                        "text": "Page Index",
+                        "color": "gray",
+                        "italic": true,
+                        "hover_event": {
+                            "action": "show_text",
+                            "value": "0-based indexing"
+                        }
+                    },
+                    "max_length": 6
+                }
+            ],
+            "pause": false,
+            "actions": [
+                {
+                    "label": {
+                        "text": "Change",
+                        "color": "light_purple",
+                        "bold": true
+                    },
+                    "width": 60,
+                    "action": {
+                        "type": "minecraft:dynamic/run_command",
+                        "template": "function reef:api/remote/linked_remote/change_page {page: $(index)}"
+                    }
+                }
+            ]
+        }
+
+function ~/remote/linked_remote/load_slideshow:
+    function ~/../load_remote_data
+    execute unless function ~/../prepare_screen_link run return fail
+    $execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:zzzinternals/screen/load_slideshow {id: '$(id)'}
+    DEV_LOGGER.info("@s", "LINKED_REMOTE/LOAD_SLIDESHOW")
+
+function ~/remote/linked_remote/change_page:
+    function ~/../load_remote_data
+    execute unless function ~/../prepare_screen_link run return fail
+    $execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/set_page {page: $(page)}
+    DEV_LOGGER.info("@s", "LINKED_REMOTE/CHANGE_PAGE")
+
+function ~/remote/linked_remote/clear_screen:
+    function ~/../load_remote_data
+    execute unless function ~/../prepare_screen_link run return fail
+    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:zzzinternals/screen/thy_shall_kill_elements
+    DEV_LOGGER.info("@s", "LINKED_REMOTE/CLEAR_SCREEN")
+
+function ~/remote/linked_remote/remove_screen:
+    function ~/../load_remote_data
+    execute unless function ~/../prepare_screen_link run return fail
+    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen]:
+        function reef:zzzinternals/screen/thy_shall_kill_elements
+        kill @n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]
+        kill @s
+    item modify entity @s weapon.mainhand reef:item/remote/convert_to_unlinked_remote
+    DEV_LOGGER.info("@s", "LINKED_REMOTE/REMOVE_SCREEN")

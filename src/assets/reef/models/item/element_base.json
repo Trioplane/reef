@@ -9,7 +9,7 @@
 			"light_emission": 15,
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 0]},
 			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#image"}
+				"north": {"uv": [0, 0, 16, 16], "texture": "#image", "tintindex": 0}
 			}
 		}
 	]

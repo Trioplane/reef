@@ -1,0 +1,38 @@
+{
+    "model": {
+        "type": "minecraft:condition",
+        "property": "minecraft:component",
+        "predicate": "minecraft:custom_data",
+        "value": {
+            "reef": {
+                "item": {
+                    "components": {
+                        "reef:link": {
+                            "linked": true
+                        }
+                    }
+                }
+            }
+        },
+        "on_true": {
+            "type": "minecraft:model",
+            "model": "reef:item/linked_remote",
+            "tints": [
+                {
+                    "type": "minecraft:constant",
+                    "value": 66046
+                }
+            ]
+        },
+        "on_false": {
+            "type": "minecraft:model",
+            "model": "reef:item/unlinked_remote",
+            "tints": [
+                {
+                    "type": "minecraft:constant",
+                    "value": 66046
+                }
+            ]
+        }
+    }
+}

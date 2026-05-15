@@ -1,8 +1,12 @@
+from mecha import Mecha
+
+mecha = ctx.inject(Mecha)
+
 class Identifier:
     def __init__(self, id):
-        namespace, path = id.split(":")
-        self.namespace = namespace
-        self.path = path
+        resource_location = mecha.parse(id, using="resource_location")
+        self.namespace = resource_location.namespace
+        self.path = resource_location.path
         self.full = f"{self.namespace}:{self.path}"
 
 class ItemDisplayElement:
@@ -29,7 +33,7 @@ class ItemDisplayElement:
     def create_model(self):
         model self.model_path ({
         	"credit": "Generated with Reef",
-            "parent": "reef:element_base",
+            "parent": "reef:item/element_base",
         	"textures": {
         		"image": self.texture_path,
         	}
@@ -42,7 +46,11 @@ class ItemDisplayElement:
             "model": {
                 "type": "minecraft:model",
                 "model": self.model_path,
-                "transformation": self.calculate_transformation_matrix()
+                "transformation": self.calculate_transformation_matrix(),
+                "tints": [{
+                    "type": "minecraft:constant",
+                    "value": 66046
+                }]
             }
         })
 
@@ -60,7 +68,7 @@ class AnimatedGraphicElement(ItemDisplayElement):
         for i in range(1, self.frames + 1):
             model f"{self.model_path}/{i}" ({
             	"credit": "Generated with Reef",
-                "parent": "reef:element_base",
+                "parent": "reef:item/element_base",
             	"textures": {
             		"image": f"{self.texture_path}/{i}",
             	}
@@ -75,7 +83,11 @@ class AnimatedGraphicElement(ItemDisplayElement):
                 "threshold": i,
                 "model": {
                     "type": "minecraft:model",
-                    "model": f"{self.model_path}/{i}"
+                    "model": f"{self.model_path}/{i}",
+                    "tints": [{
+                        "type": "minecraft:constant",
+                        "value": 66046
+                    }]
                 }
             })
         
