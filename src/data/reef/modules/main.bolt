@@ -4,8 +4,31 @@ DEV_LOGGER = Logger("reef_dev")
 function reef:load:
     function reef:api/load
     function reef:zzzinternals/load
-
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", f"Loaded! (version {ctx.project_version} [{G_ENVIRONMENT.name}])")
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", [
+        "",
+        {text: "Loaded! ", color: "green"},
+        {
+            text: "(hover for more info)", 
+            color: "dark_gray", 
+            italic: true,
+            hover_event: {
+                action: "show_text",
+                value: [
+                    "",
+                    [
+                        "",
+                        {text: "Reef", color: "light_purple", bold: true},
+                        {text: " by ", color: "gray"},
+                        {player: "Trplnr"}, {text: " Trplnr\n"},
+                    ],
+                    {text: "Version: ", color: "aqua"}, {text: f"{ctx.project_version}", color: "light_purple"}, "\n",
+                    {text: "Environment: ", color: "aqua"}, "\n",
+                    {text: "> Name: ", color: "aqua"}, {text: f"{G_ENVIRONMENT.name}", color: "light_purple"}, "\n",
+                    {text: "> See developer logs: ", color: "aqua"}, {text: f"{G_ENVIRONMENT.options.dev_logs}", color: "light_purple"}
+                ]
+            }
+        }
+    ])
 
 function reef:tick:
     function reef:api/tick
