@@ -411,22 +411,22 @@ function ~/screen/display/animated_graphic:
 
     Self.item.id = "minecraft:amethyst_shard"
     Self.item.components."minecraft:item_model" = ElementData.model
-    Self.item.components."minecraft:custom_model_data" = {floats:[1]}
+    Self.item.components."minecraft:custom_model_data" = {floats:[0]}
 
-    CurrentFrame["@s"] = 1
+    CurrentFrame["@s"] = 0
     Frames["@s"] = ElementData.frames
 
     DEV_LOGGER.info("@a", "DISPLAYING ANIMATED GRAPHIC ELEMENT")
 
     function ~/animate:
         DEV_LOGGER.info("@a", "animating animated graphic...")
+        CurrentFrame["@s"] += 1
         Self.item.components."minecraft:custom_model_data".floats[0] = CurrentFrame["@s"]
 
         if CurrentFrame["@s"] >= Frames["@s"]:
             return:
                 tag @s add reef.element.animated_graphic.finished
 
-        CurrentFrame["@s"] += 1
 
 function ~/screen/display/transition/:
     Self = Data.entity("@s")
