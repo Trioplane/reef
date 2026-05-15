@@ -218,7 +218,10 @@ function ~/screen/transition_to_page:
     CurrentFrame = Scoreboard.objective("reef.zzzinternals.element.transition.current_frame")
     SwitchFrame = Scoreboard.objective("reef.zzzinternals.element.transition.switch_frame")
     Frames = Scoreboard.objective("reef.zzzinternals.element.transition.frames")
-
+    IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
+    ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+    IDLink[".compare_value"] = ScreenID["@s"]
+    
     TempStorage.transition = Self.data.reef.screen.slideshow.current.page_data.transition
 
     #DEV_LOGGER.info("@a", "transition is NONE... skipping...")
@@ -227,9 +230,7 @@ function ~/screen/transition_to_page:
             function reef:zzzinternals/screen/cut_to_page
 
     tag @s remove reef.screen.transition.finished
-    CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")
-    ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
-    CompareValue[".compare_value"] = ScreenID["@s"]
+    
     execute as @n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen] function reef:zzzinternals/screen/display/transition/restart
     DEV_LOGGER.info("@a", ["RUNNING TRANSITION ", {storage: "reef.zzzinternals:tmp", nbt: "root.transition.font"}])
 
@@ -241,6 +242,11 @@ function ~/screen/transition_to_page:
             DEV_LOGGER.info("@a", "SWITCHING PAGE!!")
             function reef:zzzinternals/screen/cut_to_page
             tag @s add reef.screen.transition.finished
+
+function ~/screen/has_finished_transition:
+    execute if entity @s[tag=reef.screen.transition.finished] run return 1
+    LOGGER.warn("@a[tag=reef.permissions.see_debug]", "Please wait for the transition to finish.")
+    return fail
 
 function ~/screen/load_page:
     """
