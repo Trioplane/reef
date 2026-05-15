@@ -153,11 +153,6 @@ function ~/screen/setup_entity:
 
     rotate @s ~ ~
 
-    data modify entity @s data.reef.screen.slideshow.data set value []
-    data modify entity @s data.reef.screen.slideshow.current.page_number set value 0
-    data modify entity @s data.reef.screen.slideshow.current.page_data set value {}
-    data modify entity @s data.reef.screen.slideshow.current.element set value {}
-
     execute at @s summon item_display run function reef:zzzinternals/screen/display/transition/setup
     ParentID = Scoreboard.objective("reef.zzzinternals.parent.screen.id")
     ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
@@ -204,6 +199,7 @@ function ~/screen/load_slideshow:
     data modify entity @s data.reef.screen.slideshow.data set from storage reef.zzzinternals:tmp root.slideshow_data.unpacked
     execute store result score @s reef.zzzinternals.screen.slideshow.pages run data get entity @s data.reef.screen.slideshow.data
     scoreboard players set @s reef.zzzinternals.screen.slideshow.switch_to_page 0
+    function reef:zzzinternals/screen/load_page
     function reef:zzzinternals/screen/transition_to_page
 
     DEV_LOGGER.info("@a", "put unpacked slideshow to entity slideshow data")
@@ -215,6 +211,8 @@ function ~/screen/cut_to_page:
     function reef:zzzinternals/screen/advance_page_sequence
 
 function ~/screen/transition_to_page:
+    # this assumes the page is already loaded in
+
     Self = Data.entity("@s")
     TempStorage = Data.storage(reef.zzzinternals:tmp).root
     CurrentFrame = Scoreboard.objective("reef.zzzinternals.element.transition.current_frame")
@@ -226,7 +224,6 @@ function ~/screen/transition_to_page:
     #DEV_LOGGER.info("@a", "transition is NONE... skipping...")
     if TempStorage.transition._skip == True:
         return:
-            function reef:zzzinternals/screen/load_page
             function reef:zzzinternals/screen/cut_to_page
 
     tag @s remove reef.screen.transition.finished
@@ -242,7 +239,6 @@ function ~/screen/transition_to_page:
         CompareValue[".compare_value"] = ScreenID["@s"]
         execute if function reef:zzzinternals/screen/display/transition/is_switch_frame:
             DEV_LOGGER.info("@a", "SWITCHING PAGE!!")
-            function reef:zzzinternals/screen/load_page
             function reef:zzzinternals/screen/cut_to_page
             tag @s add reef.screen.transition.finished
 
@@ -257,10 +253,14 @@ function ~/screen/load_page:
     function ~/errors/page_number_lt0:
         scoreboard players operation @s reef.zzzinternals.screen.slideshow.switch_to_page = @s reef.zzzinternals.screen.slideshow.current_page
         LOGGER.error("@a[tag=reef.permissions.see_debug]", "Slideshow page number cannot be less than 0")
+        return fail
 
     function ~/errors/page_number_gtpages:
         scoreboard players operation @s reef.zzzinternals.screen.slideshow.switch_to_page = @s reef.zzzinternals.screen.slideshow.current_page
-        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Slideshow page number cannot exceed page count (", {score: {name: "@s", objective: "reef.zzzinternals.screen.slideshow.pages"}}, ")"])
+        scoreboard players operation #tmp reef.zzzinternals.screen.slideshow.pages = @s reef.zzzinternals.screen.slideshow.pages
+        scoreboard players remove #tmp reef.zzzinternals.screen.slideshow.pages 1
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Slideshow page index cannot exceed page bounds (", {score: {name: "#tmp", objective: "reef.zzzinternals.screen.slideshow.pages"}}, ")"])
+        return fail
 
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/errors/page_number_lt0
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/errors/page_number_gtpages
@@ -280,8 +280,14 @@ function ~/screen/load_page:
     execute store result score @s reef.zzzinternals.screen.slideshow.transition.frames run data get entity @s data.reef.screen.slideshow.current.page_data.transition.frames
     execute store result score @s reef.zzzinternals.screen.slideshow.transition.switch_frame run data get entity @s data.reef.screen.slideshow.current.page_data.transition.switch_frame
 
+    return 1
     #data modify entity @s data.reef.screen.slideshow.current.transition_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
     #data modify entity @s data.reef.screen.slideshow.current.sequence_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
+
+function ~/screen/has_loaded_slideshow:
+    execute if data entity @s data.reef.screen.slideshow run return 1
+    LOGGER.error("@a[tag=reef.permissions.see_debug]", "No slideshow loaded. Use a remote and open the slideshow settings to load a slideshow.")
+    return fail
 
 function ~/screen/thy_shall_kill_elements:
     IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
@@ -445,7 +451,7 @@ function ~/screen/display/transition/:
 
         Self.item.id = "minecraft:amethyst_shard"
         Self.item.components."minecraft:item_model" = "air"
-        Self.item.components."minecraft:custom_model_data" = {floats:[1]}
+        Self.item.components."minecraft:custom_model_data" = {floats:[0]}
 
         rotate @s ~ ~
         tp @s ^ ^ ^0.1
@@ -457,6 +463,7 @@ function ~/screen/display/transition/:
 
     function ~/animate:
         DEV_LOGGER.info("@a", "animating transition...")
+        CurrentFrame["@s"] += 1
         Self.item.components."minecraft:custom_model_data".floats[0] = CurrentFrame["@s"]
 
         if CurrentFrame["@s"] >= Frames["@s"]:
@@ -464,16 +471,15 @@ function ~/screen/display/transition/:
                 DEV_LOGGER.info("@a", "finished transition :D")
                 tag @s add reef.element.transition.finished
 
-        CurrentFrame["@s"] += 1
 
     function ~/load_transition:
         DEV_LOGGER.info("@a", "FAHHHHHHHHHHHHHHH x2")
-        CurrentFrame["@s"] = 1
+        CurrentFrame["@s"] = 0
         SwitchFrame["@s"] = TransitionData.switch_frame
         Frames["@s"] = TransitionData.frames
 
         Self.item.components."minecraft:item_model" = TransitionData.model
-        Self.item.components."minecraft:custom_model_data" = {floats:[1]}
+        Self.item.components."minecraft:custom_model_data" = {floats:[0]}
 
         Self.transformation.translation = TransitionData.translation
         Self.transformation.scale = TransitionData.scale

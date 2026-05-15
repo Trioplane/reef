@@ -36,7 +36,9 @@ function ~/screen/summon:
     LOGGER.info("@a[tag=reef.permissions.see_debug]", "To rotate the screen, modify the `Rotation` tag instead of `transformation`.")
 
 function ~/screen/set_page:
+    execute unless function reef:zzzinternals/screen/has_loaded_slideshow run return fail
     scoreboard players set @s reef.zzzinternals.screen.slideshow.switch_to_page $(page)
+    execute unless function reef:zzzinternals/screen/load_page run return fail
     function reef:zzzinternals/screen/transition_to_page
 
     function ~/first_page:
@@ -48,6 +50,7 @@ function ~/screen/set_page:
         LOGGER.info("@a[tag=reef.permissions.see_debug]", ["This is the last page of the slideshow."])
 
 function ~/screen/next:
+    execute unless function reef:zzzinternals/screen/has_loaded_slideshow run return fail
     execute unless function reef:zzzinternals/screen/is_current_sequence_finished run return:
         DEV_LOGGER.info("@a", "not finished... advancing sequence")
         function reef:zzzinternals/screen/advance_page_sequence
@@ -58,14 +61,17 @@ function ~/screen/next:
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/../set_page/first_page
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/../set_page/last_page
     
+    execute unless function reef:zzzinternals/screen/load_page run return fail
     function reef:zzzinternals/screen/transition_to_page
 
 function ~/screen/prev:
+    execute unless function reef:zzzinternals/screen/has_loaded_slideshow run return fail
     scoreboard players remove @s reef.zzzinternals.screen.slideshow.switch_to_page 1
 
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/../set_page/first_page
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page >= @s reef.zzzinternals.screen.slideshow.pages run return run function ~/../set_page/last_page
     
+    execute unless function reef:zzzinternals/screen/load_page run return fail
     function reef:zzzinternals/screen/transition_to_page
 
 # REMOTE STUFF
@@ -318,15 +324,26 @@ function ~/remote/linked_remote/load_remote_data:
     execute unless items entity @s weapon.mainhand *[custom_data~{reef:{item:{id:"reef:remote",components:{"reef:link":{linked: true}}}}}] run return:
         LOGGER.error("@s", "You can only perform this action when holding a linked Reef remote on your weapon.mainhand slot.")
 
-    summon item_display ~ ~ ~ {
-        Tags: ["summit.static", "reef.item_store.linked_remote.temp", "reef.entity"],
-        transformation: [
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 1
-        ]
-    }
+    if G_ENVIRONMENT.name == "summit":
+        summon item_display ~ ~ ~ {
+            Tags: ["summit.static", "reef.item_store.linked_remote.temp", "reef.entity"],
+            transformation: [
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 1
+            ]
+        }
+    else:
+        summon item_display ~ ~ ~ {
+            Tags: ["reef.item_store.linked_remote.temp", "reef.entity"],
+            transformation: [
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 1
+            ]
+        }
     item replace entity @n[type=item_display,tag=reef.item_store.linked_remote.temp] contents from entity @s weapon.mainhand
     LinkedRemoteData = Data.entity("@n[type=item_display,tag=reef.item_store.linked_remote.temp]").item.components."minecraft:custom_data".reef.item.components."reef:link"
     kill @n[type=item_display,tag=reef.item_store.linked_remote.temp]
@@ -421,6 +438,17 @@ function ~/remote/linked_remote/open_slideshow_settings:
                 "action": {
                     "type": "minecraft:run_command",
                     "command": "function reef:api/remote/linked_remote/remove_screen"
+                }
+            },
+            {
+                "label": {
+                    "text": "Unlink remote",
+                    "color": "red"
+                },
+                "width": 100,
+                "action": {
+                    "type": "minecraft:run_command",
+                    "command": "function reef:api/remote/linked_remote/unlink_remote"
                 }
             }
         ]
@@ -552,5 +580,9 @@ function ~/remote/linked_remote/remove_screen:
         function reef:zzzinternals/screen/thy_shall_kill_elements
         kill @n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]
         kill @s
+    item modify entity @s weapon.mainhand reef:item/remote/convert_to_unlinked_remote
+    DEV_LOGGER.info("@s", "LINKED_REMOTE/REMOVE_SCREEN")
+
+function ~/remote/linked_remote/unlink_remote:
     item modify entity @s weapon.mainhand reef:item/remote/convert_to_unlinked_remote
     DEV_LOGGER.info("@s", "LINKED_REMOTE/REMOVE_SCREEN")
