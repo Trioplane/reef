@@ -100,6 +100,8 @@ function ~/load:
     scoreboard objectives add reef.zzzinternals.element.transition.switch_frame dummy
     scoreboard objectives add reef.zzzinternals.element.transition.frames dummy
 
+    function reef:zzzinternals/register/transition/keywords
+
     DEV_LOGGER.info("@a", "zzzinternals module loaded")
 
 function ~/tick:
@@ -135,12 +137,20 @@ function ~/register/transition:
     $data modify storage reef.zzzinternals:registry transition."$(identifier)" set from storage $(storage_path)
     LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Transition data ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}])
 
-function ~/register/keyword/transition/none:
+function ~/register/transition/keywords:
+    def addKeyword(id, builtin_transition, options={}):
+        data remove storage reef.zzzinternals:registry f'transition."{id}"'
+        data modify storage reef.zzzinternals:registry f'transition."{id}"' set value {
+            _builtin: builtin_transition,
+            **options
+        }
+        DEV_LOGGER.info("@a", f"KEYWORD '{id}' REGISTERED")
+
+
     data remove storage reef.zzzinternals:registry transition."none"
-    data modify storage reef.zzzinternals:registry transition."none" set value {
-        _skip: true
-    }
-    DEV_LOGGER.info("@a", "KEYWORD 'none' REGISTERED")
+    addKeyword("reef:cut", "cut", options={"_skip_cut": True, "frames": 1, "switch_frame": 1})
+    addKeyword("reef:wipe", "wipe", options={"frames": 20, "switch_frame": 10})
+
 # ------------------------------
 
 IDFunction("screen")
@@ -224,11 +234,6 @@ function ~/screen/transition_to_page:
     
     TempStorage.transition = Self.data.reef.screen.slideshow.current.page_data.transition
 
-    #DEV_LOGGER.info("@a", "transition is NONE... skipping...")
-    if TempStorage.transition._skip == True:
-        return:
-            function reef:zzzinternals/screen/cut_to_page
-
     tag @s remove reef.screen.transition.finished
     
     execute as @n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen] function reef:zzzinternals/screen/display/transition/restart
@@ -238,9 +243,11 @@ function ~/screen/transition_to_page:
         CompareValue = Scoreboard.objective("reef.zzzinternals.id_link")
         ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
         CompareValue[".compare_value"] = ScreenID["@s"]
+
         execute if function reef:zzzinternals/screen/display/transition/is_switch_frame:
             DEV_LOGGER.info("@a", "SWITCHING PAGE!!")
-            function reef:zzzinternals/screen/cut_to_page
+            if not TempStorage.transition._skip_cut:
+                function reef:zzzinternals/screen/cut_to_page
             tag @s add reef.screen.transition.finished
 
 function ~/screen/has_finished_transition:
@@ -434,7 +441,7 @@ function ~/screen/display/animated_graphic:
                 tag @s add reef.element.animated_graphic.finished
 
 
-function ~/screen/display/transition/:
+function ~/screen/display/transition:
     Self = Data.entity("@s")
     TempStorage = Data.storage(reef.zzzinternals:tmp).root
     TransitionData = TempStorage.transition
@@ -484,7 +491,11 @@ function ~/screen/display/transition/:
         SwitchFrame["@s"] = TransitionData.switch_frame
         Frames["@s"] = TransitionData.frames
 
-        Self.item.components."minecraft:item_model" = TransitionData.model
+        if TransitionData.model:
+            Self.item.components."minecraft:item_model" = TransitionData.model
+        else:
+            Self.item.components."minecraft:item_model" = "air"
+
         Self.item.components."minecraft:custom_model_data" = {floats:[0]}
 
         Self.transformation.translation = TransitionData.translation
@@ -494,14 +505,39 @@ function ~/screen/display/transition/:
 
     function ~/restart:
         DEV_LOGGER.info("@a", "FAHHHHHHHHHHHHHHH")
-        tag @s remove reef.element.transition.finished
         function ~/../load_transition
+
+        if TransitionData._builtin:
+            return run function reef:zzzinternals/screen/display/transition/run_builtin/:
+                execute if data storage reef.zzzinternals:tmp root.transition{_builtin: "cut"} run return run function reef:zzzinternals/screen/display/transition/builtin/cut
+                execute if data storage reef.zzzinternals:tmp root.transition{_builtin: "wipe"} run return run function reef:zzzinternals/screen/display/transition/builtin/wipe
+
+                LOGGER.error("@a", "Unknown builtin transition.")
+
+        tag @s remove reef.element.transition.finished
 
     function ~/is_switch_frame:
         # RUN AS SCREEN
         if CurrentFrame["@n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"] >= SwitchFrame["@n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"]:
             return 1
         return fail
+
+    function ~/builtin:
+        function ~/cut:
+            DEV_LOGGER.info("@a", "CUT!!!!!!!")
+            # TODO: Implement cut
+            # TODO: tags all current elements displayed
+            # TODO: spawns the next page
+            # TODO: kill the current elements after one tick
+
+        function ~/wipe:
+            DEV_LOGGER.info("@a", "WIPE!!!!!!!!!")
+            # TODO: Implement wipe
+            # TODO: spawns an angled display the size of the screen in options
+            # TODO: moves the display infront smoothly
+            # TODO: cut to next page (handled by switch frame)
+            # TODO: move the display behind smoothly
+            # TODO: kill the display
 
 function ~/screen/is_current_sequence_finished:
     execute if data entity @s data.reef.screen.slideshow.current.page_data.sequence[0] run return fail
