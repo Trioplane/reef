@@ -24,7 +24,7 @@ jobs:
 
     - name: Read beet.json
       run: |
-        echo "NAME=$(jq -r '.name' beet.json)" >> $GITHUB_ENV
+        echo "NAME=$(jq -r '.name' beet.json | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
         echo "VERSION=$(jq -r '.version' beet.json)" >> $GITHUB_ENV
         echo "OUTPUT=$(jq -r '.output' beet.json)" >> $GITHUB_ENV
 
