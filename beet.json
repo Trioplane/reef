@@ -18,7 +18,8 @@
     "require": [
         "bolt",
         "bolt_expressions",
-        "bolt_native_macros"
+        "bolt_native_macros",
+        "beet.contrib.livereload"
     ],
     "meta": {
         "bolt": {

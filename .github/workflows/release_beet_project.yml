@@ -1,4 +1,4 @@
-name: Release beet project
+name: Release Beet project
 
 on:
   push:
@@ -13,46 +13,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Check for beet.json
-      run: |
-        if [ ! -f beet.json ]; then
-          echo "beet.json not found"
-          exit 1
-        fi
-
-    - name: Read beet.json
-      run: |
-        echo "NAME=$(jq -r '.name' beet.json | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-        echo "VERSION=$(jq -r '.version' beet.json)" >> $GITHUB_ENV
-        echo "OUTPUT=$(jq -r '.output' beet.json)" >> $GITHUB_ENV
+    - uses: actions/checkout@v6
 
     - name: Set up Python 3.14
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.14"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    - name: Build with beet
-      run: beet build
+    - name: Build Beet project
+      id: beet
+      uses: Trioplane/action-build-beet-project@v1
 
     - name: Zip build output
       run: |
-        DATA_PACK_DIR=$(ls -d ${OUTPUT}/*_data_pack/)
-        RESOURCE_PACK_DIR=$(ls -d ${OUTPUT}/*_resource_pack/)
-        cd "$DATA_PACK_DIR"
-        zip -r "../../${NAME}_${VERSION}_data_pack.zip" .
-        cd "../../$RESOURCE_PACK_DIR"
-        zip -r "../../${NAME}_${VERSION}_resource_pack.zip" .
-
+        echo '${{ steps.beet.outputs.data-packs }}' | jq -r '.[]' | while read dir; do
+          name=$(basename "$dir")
+          (cd "$dir" && zip -r "${GITHUB_WORKSPACE}/${name}.zip" .)
+        done
+          
+        echo '${{ steps.beet.outputs.resource-packs }}' | jq -r '.[]' | while read dir; do
+          name=$(basename "$dir")
+          (cd "$dir" && zip -r "${GITHUB_WORKSPACE}/${name}.zip" .)
+        done
+          
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          ${{ env.NAME }}_${{ env.VERSION }}_data_pack.zip
-          ${{ env.NAME }}_${{ env.VERSION }}_resource_pack.zip
+        files: "*.zip"

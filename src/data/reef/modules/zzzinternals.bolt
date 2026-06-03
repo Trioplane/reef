@@ -105,6 +105,15 @@ function ~/load:
     DEV_LOGGER.info("@a", "zzzinternals module loaded")
 
 function ~/tick:
+    # NOTE: remove builtin transitions in a later update, theyre SUUUUPER jank and spaghetti
+    
+    execute as @e[
+        type=#reef:zzzinternals/screen_display,
+        tag=reef.element,
+        tag=!reef.element.transition,
+        tag=reef.zzzinternals.marked_to_kill
+    ] run function reef:zzzinternals/screen/thy_shall_prepare_to_burn_the_witches/thy_shall_start_the_burning_ritual
+
     execute as @e[type=item_display,tag=reef.element.animated_graphic,tag=!reef.element.animated_graphic.finished] run function reef:zzzinternals/screen/display/animated_graphic/animate
     execute as @e[type=item_display,tag=reef.element.transition,tag=!reef.element.transition.finished] run function reef:zzzinternals/screen/display/transition/animate
     execute as @e[type=item_display,tag=reef.screen,tag=!reef.screen.transition.finished] run function reef:zzzinternals/screen/transition_to_page/listen_for_switch_frame
@@ -148,7 +157,6 @@ function ~/register/transition/keywords:
 
 
     data remove storage reef.zzzinternals:registry transition."none"
-    addKeyword("reef:cut", "cut", options={"_skip_cut": True, "frames": 1, "switch_frame": 1})
     addKeyword("reef:wipe", "wipe", options={"frames": 20, "switch_frame": 10})
 
 # ------------------------------
@@ -217,7 +225,7 @@ function ~/screen/load_slideshow:
 
 function ~/screen/cut_to_page:
     # this assumes the page is already loaded in
-    function reef:zzzinternals/screen/thy_shall_kill_elements
+    function reef:zzzinternals/screen/thy_shall_prepare_to_burn_the_witches
     function reef:zzzinternals/screen/advance_page_sequence
 
 function ~/screen/transition_to_page:
@@ -302,11 +310,22 @@ function ~/screen/has_loaded_slideshow:
     LOGGER.error("@a[tag=reef.permissions.see_debug]", "No slideshow loaded. Use a remote and open the slideshow settings to load a slideshow.")
     return fail
 
-function ~/screen/thy_shall_kill_elements:
+function ~/screen/thy_shall_prepare_to_burn_the_witches:
     IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
     ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
     IDLink[".compare_value"] = ScreenID["@s"]
-    kill @e[type=#reef:zzzinternals/screen_display,tag=!reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]
+
+    execute as @e[
+        type=#reef:zzzinternals/screen_display,
+        tag=!reef.element.transition,
+        predicate=reef:zzzinternals/id_link/parent/screen
+    ] at @s:
+        tag @s add reef.zzzinternals.marked_to_kill
+        tp @s ^ ^ ^-0.05
+
+    function ~/thy_shall_start_the_burning_ritual:
+        kill @s[tag=reef.zzzinternals.to_kill]
+        tag @s add reef.zzzinternals.to_kill
 
 function ~/screen/advance_page_sequence:
     """
@@ -315,20 +334,20 @@ function ~/screen/advance_page_sequence:
 
     DEV_LOGGER.info("@a", "advancing page sequence...")
 
+    IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
+    ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
+
     execute function ~/display_element_group:
         execute unless data entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0] run return:
             DEV_LOGGER.info("@a", "done displaying element group")
 
         data modify storage reef.zzzinternals:tmp root.element.data set from entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0]
+
+        IDLink[".to_set"] = ScreenID["@s"]
         execute at @s function ~/display_element:
             execute if data storage reef.zzzinternals:tmp root.element.data{type:"graphic"} summon item_display run return run function reef:zzzinternals/screen/display/graphic
             execute if data storage reef.zzzinternals:tmp root.element.data{type:"text"} summon text_display run return run function reef:zzzinternals/screen/display/text
             execute if data storage reef.zzzinternals:tmp root.element.data{type:"animated_graphic"} summon item_display run return run function reef:zzzinternals/screen/display/animated_graphic
-        
-        ParentID = Scoreboard.objective("reef.zzzinternals.parent.screen.id")
-        ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
-        ParentID["@n[type=#reef:zzzinternals/screen_display,tag=reef.element.new]"] = ScreenID["@s"]
-        tag @n[type=#reef:zzzinternals/screen_display,tag=reef.element.new] remove reef.element.new
 
         data remove entity @s data.reef.screen.slideshow.current.page_data.sequence[0][0]
         function ~/../display_element_group
@@ -346,12 +365,15 @@ entity_type_tag ~/screen_display {
 function ~/screen/display/common:
     tag @s add reef.entity
     tag @s add reef.element
-    tag @s add reef.element.new
 
+    ParentID = Scoreboard.objective("reef.zzzinternals.parent.screen.id")
+    IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
     Self = Data.entity("@s")
     TempStorage = Data.storage(reef.zzzinternals:tmp).root
     Transformation = Self.transformation
     ElementData = TempStorage.element.data
+
+    ParentID["@s"] = IDLink[".to_set"]
 
     # tp relative to screen
     if not ElementData.pos:
@@ -509,7 +531,6 @@ function ~/screen/display/transition:
 
         if TransitionData._builtin:
             return run function reef:zzzinternals/screen/display/transition/run_builtin/:
-                execute if data storage reef.zzzinternals:tmp root.transition{_builtin: "cut"} run return run function reef:zzzinternals/screen/display/transition/builtin/cut
                 execute if data storage reef.zzzinternals:tmp root.transition{_builtin: "wipe"} run return run function reef:zzzinternals/screen/display/transition/builtin/wipe
 
                 LOGGER.error("@a", "Unknown builtin transition.")
@@ -521,14 +542,6 @@ function ~/screen/display/transition:
         if CurrentFrame["@n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"] >= SwitchFrame["@n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"]:
             return 1
         return fail
-
-    function ~/builtin:
-        function ~/cut:
-            DEV_LOGGER.info("@a", "CUT!!!!!!!")
-            # TODO: Implement cut
-            # TODO: tags all current elements displayed
-            # TODO: spawns the next page
-            # TODO: kill the current elements after one tick
 
         function ~/wipe:
             DEV_LOGGER.info("@a", "WIPE!!!!!!!!!")

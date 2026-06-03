@@ -12,6 +12,10 @@ function ~/tick:
     tag @a[advancements={reef:item/unlinked_remote/use=false},tag=reef.item.unlinked_remote.clicked_this_tick] remove reef.item.unlinked_remote.clicked_this_tick
     advancement revoke @a only reef:item/unlinked_remote/use
 
+function ~/register/mini:
+    # todo: reef mini
+    # reef mini schema in the discord thread
+    # transforms into a normal definition by building each slideshow and page then running the register functions for them
 function ~/register/slideshow:
     $data modify storage reef.zzzinternals:in register.slideshow set value {identifier: '$(identifier)', storage_path: '$(storage_path)'}
     function reef:zzzinternals/register/slideshow with storage reef.zzzinternals:in register.slideshow
@@ -579,7 +583,7 @@ function ~/remote/linked_remote/remove_screen:
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen]:
-        function reef:zzzinternals/screen/thy_shall_kill_elements
+        function reef:zzzinternals/screen/thy_shall_prepare_to_burn_the_witches
         kill @n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]
         kill @s
     item modify entity @s weapon.mainhand reef:item/remote/convert_to_unlinked_remote
