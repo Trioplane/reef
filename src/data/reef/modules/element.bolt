@@ -111,3 +111,47 @@ class AnimatedGraphicElement(ItemDisplayElement):
 
 class TransitionElement(AnimatedGraphicElement):
     pass
+
+class MiniSlideshow(ItemDisplayElement):
+    def __init__(self, id, texture: str, size: tuple[int, int], page_count: int):
+        super().__init__(id, texture, size)
+        self.page_count = page_count
+
+    def create_model(self):
+        for i in range(0, self.page_count):
+            model f"{self.model_path}/{i}" ({
+            	"credit": "Generated with Reef",
+                "parent": "reef:item/element_base",
+            	"textures": {
+            		"image": f"{self.texture_path}/{i}",
+            	}
+            })
+        
+        return self
+
+    def create_item_definition(self):
+        entries = []
+        for i in range(0, self.page_count):
+            entries.append({
+                "threshold": i,
+                "model": {
+                    "type": "minecraft:model",
+                    "model": f"{self.model_path}/{i}",
+                    "tints": [{
+                        "type": "minecraft:constant",
+                        "value": 66046
+                    }]
+                }
+            })
+        
+        item_model self.id.full ({
+            "model": {
+                "type": "minecraft:range_dispatch",
+                "property": "minecraft:custom_model_data",
+                "index": 0,
+                "entries": entries,
+                "transformation": self.calculate_transformation_matrix()
+            }
+        })
+
+        return self

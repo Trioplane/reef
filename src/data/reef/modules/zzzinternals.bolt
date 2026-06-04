@@ -100,6 +100,8 @@ function ~/load:
     scoreboard objectives add reef.zzzinternals.element.transition.switch_frame dummy
     scoreboard objectives add reef.zzzinternals.element.transition.frames dummy
 
+    scoreboard objectives add reef.zzzinternals.register.mini dummy
+
     function reef:zzzinternals/register/transition/keywords
 
     DEV_LOGGER.info("@a", "zzzinternals module loaded")
@@ -158,6 +160,53 @@ function ~/register/transition/keywords:
 
     data remove storage reef.zzzinternals:registry transition."none"
     addKeyword("reef:wipe", "wipe", options={"frames": 20, "switch_frame": 10})
+
+function ~/register/mini:
+    $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/mini/errors/definition_not_found
+    function ~/errors/definition_not_found:
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Mini slideshow data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, "."])
+
+    MiniScore = Scoreboard.objective("reef.zzzinternals.register.mini")
+    InStorage = Data.storage("reef.zzzinternals:in").register.mini
+    MiniData = Data.storage("reef.zzzinternals:tmp").register.mini
+    SlideshowRegistry = Data.storage("reef.zzzinternals:registry").slideshow
+    PageRegistry = Data.storage("reef.zzzinternals:registry").page
+
+    $data modify storage reef.zzzinternals:tmp register.mini set from storage $(storage_path)
+    $data modify storage reef.zzzinternals:tmp register.mini.identifier set value '$(identifier)'
+
+    MiniScore[".page_count"] = MiniData.page_count
+    MiniScore[".current_page"] = 0
+    MiniData.current_page = MiniScore[".current_page"]
+
+    $data remove storage reef.zzzinternals:registry slideshow."$(identifier)"
+    execute function ~/recurse with var MiniData:
+        if MiniScore[".current_page"] >= MiniScore[".page_count"]:
+            return 1
+
+        # build slideshow data
+        $data modify storage reef.zzzinternals:registry slideshow.'$(identifier)' append value '$(identifier)/$(current_page)'
+
+        # build page data
+        MiniData.built_page = {
+            sequence: [[{
+                type: "graphic",
+                model: MiniData.model,
+                components: {"minecraft:custom_model_data": {floats:[MiniData.current_page]}}
+            }]]
+        }
+
+        if MiniData.transition:
+            MiniData.built_page.transition = MiniData.transition
+
+        $data remove storage reef.zzzinternals:registry page."$(identifier)/$(current_page)"
+        $data modify storage reef.zzzinternals:registry page.'$(identifier)/$(current_page)' set from storage reef.zzzinternals:tmp register.mini.built_page
+        
+        MiniScore[".current_page"] += 1
+        MiniData.current_page = MiniScore[".current_page"]
+        function ~/ with var MiniData
+
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Mini slideshow data ", {storage: "reef.zzzinternals:in", nbt: "register.mini.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.mini.identifier"}])
 
 # ------------------------------
 
@@ -239,6 +288,9 @@ function ~/screen/transition_to_page:
     IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
     ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
     IDLink[".compare_value"] = ScreenID["@s"]
+
+    if not Self.data.reef.screen.slideshow.current.page_data.transition:
+        return run function reef:zzzinternals/screen/cut_to_page
     
     TempStorage.transition = Self.data.reef.screen.slideshow.current.page_data.transition
 
@@ -371,7 +423,7 @@ function ~/screen/display/common:
     Self = Data.entity("@s")
     TempStorage = Data.storage(reef.zzzinternals:tmp).root
     Transformation = Self.transformation
-    ElementData = TempStorage.element.data
+    ElementData = TempStorage.element.data  
 
     ParentID["@s"] = IDLink[".to_set"]
 
@@ -417,6 +469,9 @@ function ~/screen/display/text:
     Self.alignment = ElementData.alignment
     Self.line_width = ElementData.width
 
+    if ElementData.components:
+        Self.item.components = ElementData.components
+
     DEV_LOGGER.info("@a", "DISPLAYING TEXT ELEMENT")
 
 function ~/screen/display/graphic:
@@ -430,6 +485,10 @@ function ~/screen/display/graphic:
     ElementData = TempStorage.element.data
 
     Self.item.id = "minecraft:amethyst_shard"
+
+    if ElementData.components:
+        Self.item.components = ElementData.components
+
     Self.item.components."minecraft:item_model" = ElementData.model
 
     DEV_LOGGER.info("@a", "DISPLAYING GRAPHIC ELEMENT")
@@ -445,6 +504,10 @@ function ~/screen/display/animated_graphic:
     Frames = Scoreboard.objective("reef.zzzinternals.element.animated_graphic.frames")
 
     Self.item.id = "minecraft:amethyst_shard"
+
+    if ElementData.components:
+        Self.item.components = ElementData.components
+
     Self.item.components."minecraft:item_model" = ElementData.model
     Self.item.components."minecraft:custom_model_data" = {floats:[0]}
 
