@@ -1,0 +1,26 @@
+[build-system]
+requires = ["uv_build >= 0.11.7, <0.12.0"]
+build-backend = "uv_build"
+
+[project]
+name = "reef-beet-plugin"
+version = "1.0.0-beta2"
+description = "Beet plugin to autogenerate Reef compatible data packs and resource packs from PDF and Google Slides presentations."
+authors = [{ name = "Trplnr", email = "triopane30@gmail.com" }]
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+keywords = ["beet", "minecraft", "datapack", "resource_pack", "presentation", "reef"]
+requires-python = ">=3.14"
+dependencies = [
+    "beet>=0.115.0",
+    "pdf2image>=1.17.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/Trioplane/reef"
+Issues = "https://github.com/Trioplane/reef/issues"
+Repository = "https://github.com/Trioplane/reef/blob/main/packages/reef"
+
+[tool.uv.build-backend]
+module-name = "reef"

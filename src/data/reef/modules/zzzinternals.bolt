@@ -449,6 +449,7 @@ function ~/screen/display/common:
     Transformation.left_rotation = ElementData.left_rotation
     Transformation.right_rotation = ElementData.right_rotation
     Self.brightness = {block: 15, sky: 15}
+    Self.view_range = 10
 
 function ~/screen/display/text:
     function ~/../common

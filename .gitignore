@@ -1,4 +1,8 @@
 .venv
 .beet_cache
-/build
+build/
 **/test*
+__pycache__
+.cache
+dist/
+*.egg-info
