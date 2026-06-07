@@ -1,0 +1,5 @@
+{
+  "path": "./CHANGELOG.md",
+  "validation_level": "warn",
+  "validation_depth": 10
+}
