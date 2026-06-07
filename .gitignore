@@ -1,8 +1,12 @@
 .venv
 .beet_cache
 build/
-**/test*
 __pycache__
 .cache
 dist/
 *.egg-info
+
+# remove testing files
+**/test*
+src/data/*/reef/
+src/assets/*/reef/
