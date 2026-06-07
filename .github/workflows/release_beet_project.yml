@@ -15,6 +15,11 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
+    - name: Install Poppler
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y poppler-utils libpoppler-cpp-de
+
     - name: Set up Python 3.14
       uses: actions/setup-python@v6
       with:
