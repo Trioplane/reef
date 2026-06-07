@@ -30,7 +30,7 @@
         "reef": {
             "tint": 66046,
             "pdf": {
-                "poppler_path": "C:/development/libraries/poppler-26.02.0/Library/bin"
+                "dpi": 144
             }
         }
     },
