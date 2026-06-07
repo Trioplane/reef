@@ -17,3 +17,13 @@ Reef is a slideshow / slide deck / presentation library that provides tools to m
 - Items:
   * Remote - controls the screen it is linked to
 - *...and more coming soon!*
+
+## Credits
+- Author - @trplnr
+- Co-author - @rx97
+### Thanks to:
+- Smithed Summit team for reaching out to make this project and being the inspiration for this project.
+- People who helped me test:
+  * @rx97
+  * @hablethedev on Discord
+  * @stoupy on Discord
