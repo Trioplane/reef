@@ -2,7 +2,8 @@ from beet import Context, Model, configurable
 import logging
 
 from .options import ReefPluginOptions
-from .pdf import pdf
+from . import assets
+from . import data
 
 __all__ = [
 	"reef",
@@ -38,4 +39,5 @@ def reef(ctx: Context, opts: ReefPluginOptions):
 
 	logger.debug("Created reef:item/element_base")
 
-	ctx.require(pdf)
+	ctx.require(assets.pdf)
+	ctx.require(data.special)

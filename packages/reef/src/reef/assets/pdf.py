@@ -2,6 +2,7 @@ import logging
 import json
 import shutil
 from pathlib import Path
+import re
 from tempfile import TemporaryDirectory
 from typing import Any, ClassVar
 
@@ -21,15 +22,15 @@ from beet import (
 )
 from PIL import Image
 
-from .options import ReefPluginOptions
+from ..options import ReefPluginOptions
 
 __all__ = ["pdf"]
 
-PDF_NAMESPACE = "reef/pdf"
+PDF_NAMESPACE = "reef/assets/pdf"
 logger = logging.getLogger(PDF_NAMESPACE)
 
 def create_reef_pdf_asset_namespace(ctx: Context, opts: ReefPluginOptions):
-    class ReefPdf(File):
+    class ReefPdfAsset(File):
         """Class representing a Reef PDF file."""
 
         scope: ClassVar[NamespaceFileScope] = ("reef",)
@@ -52,6 +53,15 @@ def create_reef_pdf_asset_namespace(ctx: Context, opts: ReefPluginOptions):
             # Cache the original PDF
             ctx.cache[PDF_NAMESPACE].download(pdf_path.as_uri())
             logger.debug("Cached pdf %s (%s)", f"{namespace}:{path}", pdf_path)
+            
+            # Cache the plugin options
+            opts_dict = opts.model_dump()
+            with ctx.cache[PDF_NAMESPACE] as cache:
+                if cache.json.get("options") != opts_dict:
+                    logger.debug("Invalidating cache due to plugin options change")
+                    cache.clear()
+                    logger.debug("Cached plugin options")
+                    cache.json["options"] = opts_dict
 
             # Cache the images if we didn't hit the cache
             if ctx.cache[PDF_NAMESPACE].has_changed(pdf_path):
@@ -104,9 +114,14 @@ def create_reef_pdf_asset_namespace(ctx: Context, opts: ReefPluginOptions):
                         logger.debug("Copied %s (%s)", f"{namespace}:{path}/{i}.png", cache_path)
 
             # Generate the resource pack assets
-            self.generate_assets(pack, namespace, path, images)
-            self.generate_data(ctx.data, namespace, path, pdf_info)
-
+            match = re.match(r"([\d.]+) x ([\d.]+) pts", pdf_info["Page size"])
+            
+            if not match:
+                raise ValueError(f'Could not parse page size from: "{pdf_info['Page size']}" ({namespace}:{path})')
+            
+            page_size = (float(match.group(1)), float(match.group(2)))
+            self.generate_assets(pack, namespace, path, images, page_size)
+            
             # Prevent the PDF itself from getting put into the resource pack
             raise Drop()
 
@@ -115,19 +130,19 @@ def create_reef_pdf_asset_namespace(ctx: Context, opts: ReefPluginOptions):
             pack: ResourcePack, 
             namespace: str, 
             path: str, 
-            images: list[Image.Image]
+            images: list[Image.Image],
+            page_size: tuple[float, float]
         ) -> None:
             resource_location_path = f"reef/mini/{path}"
 
             # Calculate the transformation matrix
-            image_size = images[0].size
             offset = (
-                0.5 - image_size[0] / 16,
-                0.5 - image_size[1] / 16
+                0.5 - page_size[0] / 16,
+                0.5 - page_size[1] / 16
             )
             transformation_matrix = [
-                image_size[0], 0,            0, offset[0], 
-                0,            image_size[1], 0, offset[1], 
+                page_size[0], 0,            0, offset[0], 
+                0,            page_size[1], 0, offset[1], 
                 0,            0,            1,       0.5, 
                 0,            0,            0,       1
             ]
@@ -182,50 +197,7 @@ def create_reef_pdf_asset_namespace(ctx: Context, opts: ReefPluginOptions):
 
             logger.debug("Done building resource pack files!")
 
-        def generate_data(
-            self, 
-            pack: DataPack,
-            namespace: str, 
-            path: str, 
-            pdf_info: dict[str, Any]
-        ):
-            identifier = f"{namespace}:{path}"
-            storage = f"{namespace}:reef"
-            nbt_path = f'register.mini."{identifier}"'
-            
-            logger.debug("Building data %s", f"{namespace}:reef/{path}")
-            
-            log_prefix = ["", {"text": "[", "color": "#6e3787"}, {"text": "reef", "color": "#ed2de3"}, {"text": "] ", "color": "#6e3787"}]
-            register_main = pack[namespace].functions.setdefault("reef/register_namespace", Function([
-                f"tellraw @a[tag=reef.permissions.see_debug] {json.dumps([*log_prefix, {"text": f"Registering data for namespace '{namespace}'", "color": "#77d6ff"}])}",
-            ]))
-            
-            
-            pack[namespace].functions[f"reef/{path}/register_mini"] = Function([
-                f'data modify storage {storage} {nbt_path} set value {{model: "{namespace}:reef/mini/{path}", page_count: {pdf_info["Pages"]}}}',
-                f'function reef:api/register/mini {{identifier: "{identifier}", storage_path: \'{storage} {nbt_path}\'}}'
-            ])
-            
-            register_main.append([
-                f"function {namespace}:reef/{path}/register_mini"
-            ])
-
-    return ReefPdf
-
-# TODO: make ReefDataDefiniton(File)
-"""
-{
-  "type": "pdf",
-  "pdf": "ns:pdf_file", // points to assets/ns/reef/pdf/pdf_file
-  "size": [100, 100], // [x, y] | optional | default = image size
-  "transition": "ns:my_transition" // optional
-}
-
-{
-  "type": "slideshow", "page", "transition", "mini", "pdf", "gslide"
-}
-"""
-
+    return ReefPdfAsset
 
 @configurable("reef", validator=ReefPluginOptions)
 def pdf(ctx: Context, opts: ReefPluginOptions):

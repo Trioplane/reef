@@ -1,0 +1,36 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- *nothing yet...*
+
+## [1.0.0-beta3] - 2026-06-07
+
+### Added
+- Reef Special namespace (`data/ns/reef/special`) that handles data pack code-gen.
+- `reef:pdf` reef special type.
+- `reef:item_model` reef special type.
+- Reef Special types can use `transition` to specify a transition to play for the entire slideshow.
+- CHANGELOG.md
+
+### Changed
+- Reef PDF asset namespace no longer handles data pack code-gen. It now purely handles resource pack code-gen.
+- In-game slideshow size now uses the PDF `Page size` data.
+- Cache now invalidates when the Reef plugin options changes.
+
+## [1.0.0-beta2] - 2026-06-06
+
+### Changed
+- README.md
+
+## [1.0.0-beta1] - 2026-06-06
+
+### Added
+- PDF data and asset generation support.
+- PDF namespace.
