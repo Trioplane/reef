@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - *nothing yet...*
 
-# [1.0.0-beta4] - 2026-06-07
+## [1.0.0-beta4] - 2026-06-07
 - `components` field on elements to add arbitrary data components to the display entities.
 - Reef mini definition
 - Reef mini register API (`reef:api/register/mini`)
