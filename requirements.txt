@@ -38,7 +38,7 @@ pyproject_hooks==1.2.0
 pywin32-ctypes==0.2.3
 PyYAML==6.0.3
 readme_renderer==44.0
--e git+https://github.com/Trioplane/reef.git@fb7399b5e88425de0cc30eb05e6af74d95a6fe09#egg=reef_beet_plugin&subdirectory=packages\reef
+reef-beet-plugin==1.0.0b3
 requests==2.34.2
 requests-toolbelt==1.0.0
 rfc3986==2.0.0
