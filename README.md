@@ -19,11 +19,12 @@ Reef is a slideshow / slide deck / presentation library that provides tools to m
 - *...and more coming soon!*
 
 ## Credits
-- Author - @trplnr
-- Co-author - @rx97
+- Author - [@rx-dev](https://github.com/trplnr)
+- Co-author - [@rx-dev](https://github.com/rx-dev)
 ### Thanks to:
 - Smithed Summit team for reaching out to make this project and being the inspiration for this project.
 - People who helped me test:
-  * @rx97
-  * @hablethedev on Discord
-  * @stoupy on Discord
+  * [@rx-dev](https://github.com/rx-dev)
+  * [@hablethedev](https://github.com/hablethedev)
+  * [@Stoupy51](https://github.com/Stoupy51)
+
