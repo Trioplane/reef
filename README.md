@@ -19,7 +19,7 @@ Reef is a slideshow / slide deck / presentation library that provides tools to m
 - *...and more coming soon!*
 
 ## Credits
-- Author - [@rx-dev](https://github.com/trplnr)
+- Author - [@trplnr](https://github.com/trplnr)
 - Co-author - [@rx-dev](https://github.com/rx-dev)
 ### Thanks to:
 - Smithed Summit team for reaching out to make this project and being the inspiration for this project.
