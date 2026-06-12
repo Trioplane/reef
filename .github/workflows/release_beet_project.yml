@@ -60,3 +60,13 @@ jobs:
       with:
         files: "*.zip"
         body: ${{ steps.changelog_reader.outputs.changes }}
+
+    - name: Create Modrinth Release
+      uses: Kir-Antipov/mc-publish@v3.3
+      with:
+        modrinth-id: v1RI6iRt
+        modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+        files: "*.zip"
+        name: "${{ steps.beet.outputs.name }} ${{ steps.beet.outputs.version }}"
+        version: ${{ steps.beet.outputs.version }}
+        changelog: ${{ steps.changelog_reader.outputs.changes }}
