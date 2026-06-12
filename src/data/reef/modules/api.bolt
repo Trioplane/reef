@@ -371,18 +371,24 @@ function ~/remote/linked_remote/prepare_screen_link:
     return 1
 
 function ~/remote/linked_remote/next:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/next
     DEV_LOGGER.info("@a", "~/remote/next")
 
 function ~/remote/linked_remote/prev:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/prev
     DEV_LOGGER.info("@a", "~/remote/prev")
 
 function ~/remote/linked_remote/open_slideshow_settings:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     dialog show @s {
         "type": "minecraft:multi_action",
         "title": {
@@ -468,6 +474,8 @@ function ~/remote/linked_remote/open_slideshow_settings:
     DEV_LOGGER.info("@a", "~/remote/open_slideshow_settings")
 
     function ~/open_load_slideshow_dialog:
+        execute if entity @s[tag=!reef.permissions.use_remote] run return:
+            LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
         dialog show @s {
             "type": "minecraft:multi_action",
             "title": {
@@ -518,6 +526,8 @@ function ~/remote/linked_remote/open_slideshow_settings:
         }
 
     function ~/open_change_page_dialog:
+        execute if entity @s[tag=!reef.permissions.use_remote] run return:
+            LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
         dialog show @s {
             "type": "minecraft:multi_action",
             "title": {
@@ -566,24 +576,32 @@ function ~/remote/linked_remote/open_slideshow_settings:
         }
 
 function ~/remote/linked_remote/load_slideshow:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
     $execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:zzzinternals/screen/load_slideshow {id: '$(id)'}
     DEV_LOGGER.info("@s", "LINKED_REMOTE/LOAD_SLIDESHOW")
 
 function ~/remote/linked_remote/change_page:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
     $execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/set_page {page: $(page)}
     DEV_LOGGER.info("@s", "LINKED_REMOTE/CHANGE_PAGE")
 
 function ~/remote/linked_remote/clear_screen:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:zzzinternals/screen/thy_shall_kill_elements
     DEV_LOGGER.info("@s", "LINKED_REMOTE/CLEAR_SCREEN")
 
 function ~/remote/linked_remote/remove_screen:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen]:
@@ -594,5 +612,7 @@ function ~/remote/linked_remote/remove_screen:
     DEV_LOGGER.info("@s", "LINKED_REMOTE/REMOVE_SCREEN")
 
 function ~/remote/linked_remote/unlink_remote:
+    execute if entity @s[tag=!reef.permissions.use_remote] run return:
+        LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     item modify entity @s weapon.mainhand reef:item/remote/convert_to_unlinked_remote
     DEV_LOGGER.info("@s", "LINKED_REMOTE/REMOVE_SCREEN")

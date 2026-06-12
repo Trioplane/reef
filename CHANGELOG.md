@@ -8,7 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - *nothing yet...*
+
+### Changed
+
+- All remote API functions now check if the player has the `reef.permissions.use_remote` permission. 
 
 ## [1.0.0-beta4] - 2026-06-07
 
