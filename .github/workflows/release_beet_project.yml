@@ -69,5 +69,6 @@ jobs:
         files: "*.zip"
         name: "${{ steps.beet.outputs.name }} ${{ steps.beet.outputs.version }}"
         version: ${{ steps.beet.outputs.version }}
-        loaders: minecraft
+        loaders: |
+          minecraft
         changelog: ${{ steps.changelog_reader.outputs.changes }}
