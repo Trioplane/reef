@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0-beta5] - 2026-06-13
 
+
+### Added
+
 - Ability to trigger commands on pages on certain events.
     * `commands.on_load` - Triggers when the page data gets loaded. Elements hasn't been displayed on this step.
     * `commands.on_enter` - Triggers after elements display.
