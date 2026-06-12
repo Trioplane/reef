@@ -273,9 +273,17 @@ function ~/screen/load_slideshow:
     LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Successfuly loaded slideshow data to screen ID #", {score: {name: "@s", objective: "reef.zzzinternals.screen.id"}}])
 
 function ~/screen/cut_to_page:
+    Self = Data.entity("@s")
+    PageData = Self.data.reef.screen.slideshow.current.page_data
+    TempStorage = Data.storage(reef.zzzinternals:tmp).root
+
     # this assumes the page is already loaded in
     function reef:zzzinternals/screen/thy_shall_prepare_to_burn_the_witches
     function reef:zzzinternals/screen/advance_page_sequence
+
+    if PageData.commands.on_enter:
+        TempStorage.commands_to_run.list = PageData.commands.on_enter
+        execute at @s run function reef:zzzinternals/screen/run_command_list
 
 function ~/screen/transition_to_page:
     # this assumes the page is already loaded in
@@ -346,12 +354,24 @@ function ~/screen/load_page:
 
     execute store result entity @s data.reef.screen.slideshow.current.page_number int 1 run scoreboard players get @s reef.zzzinternals.screen.slideshow.current_page
 
+    # Run the unload commands
+    Self = Data.entity("@s")
+    PageData = Self.data.reef.screen.slideshow.current.page_data
+    if PageData.commands.on_unload:
+        TempStorage.commands_to_run.list = PageData.commands.on_unload
+        execute at @s run function reef:zzzinternals/screen/run_command_list
+
     # Put current page data into its respective fields
     with entity @s data.reef.screen.slideshow.current:
         data modify entity @s data.reef.screen.slideshow.current.page_data set from entity @s data.reef.screen.slideshow.data[$(page_number)]
 
     execute store result score @s reef.zzzinternals.screen.slideshow.transition.frames run data get entity @s data.reef.screen.slideshow.current.page_data.transition.frames
     execute store result score @s reef.zzzinternals.screen.slideshow.transition.switch_frame run data get entity @s data.reef.screen.slideshow.current.page_data.transition.switch_frame
+
+    # Run the load commands
+    if PageData.commands.on_load:
+        TempStorage.commands_to_run.list = PageData.commands.on_load
+        execute at @s run function reef:zzzinternals/screen/run_command_list
 
     return 1
     #data modify entity @s data.reef.screen.slideshow.current.transition_data set from entity @s data.reef.screen.slideshow.current.page_data.transition
@@ -366,6 +386,9 @@ function ~/screen/thy_shall_prepare_to_burn_the_witches:
     IDLink = Scoreboard.objective("reef.zzzinternals.id_link")
     ScreenID = Scoreboard.objective("reef.zzzinternals.screen.id")
     IDLink[".compare_value"] = ScreenID["@s"]
+    Self = Data.entity("@s")
+    PageData = Self.data.reef.screen.slideshow.current.page_data
+    ElementData = Self.data.reef.element_data
 
     execute as @e[
         type=#reef:zzzinternals/screen_display,
@@ -375,7 +398,16 @@ function ~/screen/thy_shall_prepare_to_burn_the_witches:
         tag @s add reef.zzzinternals.marked_to_kill
         tp @s ^ ^ ^-0.05
 
+    if PageData.commands.on_exit:
+        TempStorage.commands_to_run.list = PageData.commands.on_exit
+        execute at @s run function reef:zzzinternals/screen/run_command_list
+
     function ~/thy_shall_start_the_burning_ritual:
+        execute if entity @s[tag=reef.element,tag=reef.zzzinternals.to_kill]:
+            if ElementData.commands.on_exit:
+                TempStorage.commands_to_run.list = ElementData.commands.on_exit
+                execute at @s run function reef:zzzinternals/screen/run_command_list
+
         kill @s[tag=reef.zzzinternals.to_kill]
         tag @s add reef.zzzinternals.to_kill
 
@@ -423,6 +455,7 @@ function ~/screen/display/common:
     Self = Data.entity("@s")
     TempStorage = Data.storage(reef.zzzinternals:tmp).root
     Transformation = Self.transformation
+    ElementData = Self.data.reef.element_data
     ElementData = TempStorage.element.data  
 
     ParentID["@s"] = IDLink[".to_set"]
@@ -433,11 +466,11 @@ function ~/screen/display/common:
 
     rotate @s ~ ~
     
-    TempStorage.element.pos.x = ElementData.pos[0]
-    TempStorage.element.pos.y = ElementData.pos[1]
-    TempStorage.element.pos.z = ElementData.pos[2]
+    Self.data.reef.pos.x = ElementData.pos[0]
+    Self.data.reef.pos.y = ElementData.pos[1]
+    Self.data.reef.pos.z = ElementData.pos[2]
 
-    with var TempStorage.element.pos:
+    with var Self.data.reef.pos:
         $tp @s ^$(x) ^$(y) ^$(z)
 
     Transformation.translation = ElementData.translation
@@ -451,6 +484,24 @@ function ~/screen/display/common:
     Self.brightness = {block: 15, sky: 15}
     Self.view_range = 10
 
+function ~/screen/run_command_list:
+    Commands = Data.storage(reef.zzzinternals:tmp).root.commands_to_run
+
+    execute function ~/recurse:
+        if not Commands.list[0]:
+            return 1
+
+        Commands.current_command = Commands.list[0]
+
+        with var Commands:
+            $$(current_command)
+
+        data remove storage reef.zzzinternals:tmp root.commands_to_run.list[0]
+
+        function ~/
+
+    data remove storage reef.zzzinternals:tmp root.commands_to_run
+
 function ~/screen/display/text:
     function ~/../common
     tag @s add reef.element.text
@@ -458,8 +509,7 @@ function ~/screen/display/text:
         tag @s add summit.static
 
     Self = Data.entity("@s")
-    TempStorage = Data.storage(reef.zzzinternals:tmp).root
-    ElementData = TempStorage.element.data
+    ElementData = Self.data.reef.element_data
 
     Self.text = ElementData.text
 
@@ -470,8 +520,13 @@ function ~/screen/display/text:
     Self.alignment = ElementData.alignment
     Self.line_width = ElementData.width
 
+    # maybe put this in a post common function?
     if ElementData.components:
         Self.item.components = ElementData.components
+
+    if ElementData.commands.on_enter:
+        TempStorage.commands_to_run.list = ElementData.commands.on_enter
+        execute at @s run function reef:zzzinternals/screen/run_command_list
 
     DEV_LOGGER.info("@a", "DISPLAYING TEXT ELEMENT")
 
@@ -482,13 +537,16 @@ function ~/screen/display/graphic:
         tag @s add summit.static
 
     Self = Data.entity("@s")
-    TempStorage = Data.storage(reef.zzzinternals:tmp).root
-    ElementData = TempStorage.element.data
+    ElementData = Self.data.reef.element_data
 
     Self.item.id = "minecraft:amethyst_shard"
 
     if ElementData.components:
         Self.item.components = ElementData.components
+
+    if ElementData.commands.on_enter:
+        TempStorage.commands_to_run.list = ElementData.commands.on_enter
+        execute at @s run function reef:zzzinternals/screen/run_command_list
 
     Self.item.components."minecraft:item_model" = ElementData.model
 
@@ -499,8 +557,7 @@ function ~/screen/display/animated_graphic:
     tag @s add reef.element.animated_graphic
 
     Self = Data.entity("@s")
-    TempStorage = Data.storage(reef.zzzinternals:tmp).root
-    ElementData = TempStorage.element.data
+    ElementData = Self.data.reef.element_data
     CurrentFrame = Scoreboard.objective("reef.zzzinternals.element.animated_graphic.current_frame")
     Frames = Scoreboard.objective("reef.zzzinternals.element.animated_graphic.frames")
 
@@ -514,6 +571,10 @@ function ~/screen/display/animated_graphic:
 
     CurrentFrame["@s"] = 0
     Frames["@s"] = ElementData.frames
+
+    if ElementData.commands.on_enter:
+        TempStorage.commands_to_run.list = ElementData.commands.on_enter
+        execute at @s run function reef:zzzinternals/screen/run_command_list
 
     DEV_LOGGER.info("@a", "DISPLAYING ANIMATED GRAPHIC ELEMENT")
 

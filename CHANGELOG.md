@@ -9,11 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *nothing yet...*
+- *nothing yet...* 
+
+## [1.0.0-beta5] - 2026-06-13
+
+- Ability to trigger commands on pages on certain events.
+    * `commands.on_load` - Triggers when the page data gets loaded. Elements hasn't been displayed on this step.
+    * `commands.on_enter` - Triggers after elements display.
+    * `commands.on_unload` - Triggers when the page unloads.
+- Ability to trigger commands on elements on certain events.
+    * `commands.on_enter` - Triggers when the element gets spawned.
+    * `commands.on_exit` - Triggers when the element is about to be removed.
+- Element entities now store their element data in their `data` NBT rather than being stored temporarily in a temporary internal storage.
 
 ### Changed
 
-- All remote API functions now check if the player has the `reef.permissions.use_remote` permission. 
+- All remote API functions now check if the player has the `reef.permissions.use_remote` permission.
 
 ## [1.0.0-beta4] - 2026-06-07
 
