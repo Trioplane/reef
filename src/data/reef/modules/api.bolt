@@ -596,7 +596,7 @@ function ~/remote/linked_remote/clear_screen:
         LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
-    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:zzzinternals/screen/thy_shall_kill_elements
+    execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:zzzinternals/screen/thy_shall_prepare_to_burn_the_witches
     DEV_LOGGER.info("@s", "LINKED_REMOTE/CLEAR_SCREEN")
 
 function ~/remote/linked_remote/remove_screen:
