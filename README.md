@@ -1,15 +1,20 @@
-<p align="center"><img src="repository/reef_banner.png" /></p>
+<p align="center"><img src="repository/reef_banner.png" alt="Reef Banner" /></p>
 
 Reef is a slideshow / slide deck / presentation library that provides tools to make, and present slideshows in-game in Minecraft: Java Edition.
 
 ---
 
-<p align="center"><img src="repository/warning_sign.png" /></p>
+<p align="center"><img src="repository/warning_sign.png" alt="Warning Sign" /></p>
 
 > [!WARNING]
 > This is currently **work in progress!** Be cautious when using this library in its unfinished state as it may break your world!
 
-<p align="center"><img src="repository/warning_sign.png" /></p>
+<p align="center"><img src="repository/warning_sign.png" alt="Warning Sign" /></p>
+
+<p align="center">
+  <a href="https://github.com/Trioplane/reef/releases"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/github_vector.svg" alt="GitHub Releases" /></a>
+  <a href="https://modrinth.com/datapack/reef-slideshow-library"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg" alt="GitHub Releases" /></a>
+</p>
 
 ## Features *(to implement)*
 - Data-driven slideshow definitions
