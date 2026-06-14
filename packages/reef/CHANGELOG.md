@@ -8,15 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- *nothing yet...*
+- Reef Slideshow namespace (`data/ns/reef/slideshow`) that generates registry functions.
+- Reef Page namespace (`data/ns/reef/page`) that generates registry functions.
 
 ## [1.0.0-beta3] - 2026-06-07
 
 ### Added
 - Reef Special namespace (`data/ns/reef/special`) that handles data pack code-gen.
-- `reef:pdf` reef special type.
-- `reef:item_model` reef special type.
-- Reef Special types can use `transition` to specify a transition to play for the entire slideshow.
+    * `reef:pdf` reef special type.
+    * `reef:item_model` reef special type.
+    * Reef Special types can use `transition` to specify a transition to play for the entire slideshow.
 - CHANGELOG.md
 
 ### Changed

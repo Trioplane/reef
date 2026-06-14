@@ -14,6 +14,7 @@ from beet import (
     NamespaceFileScope,
 )
 
+from ..models import ResourceLocation
 from ..options import ReefPluginOptions
 
 __all__ = ["special"]
@@ -21,16 +22,14 @@ __all__ = ["special"]
 SPECIAL_NAMESPACE = "reef/data/special"
 logger = logging.getLogger(SPECIAL_NAMESPACE)
 
-ResourceLocation = Annotated[str, Field(pattern=r'^[0-9a-z_\-.]+:[0-9a-z_\-./]+$')]
-
-class ReefBaseSpecialDataSchema(BaseModel):
+class ReefBaseSpecialDataModel(BaseModel):
     transition: ResourceLocation | None = None
     """Resource location of a transition"""
     
     page_count: int
     """Page count of the slideshow"""
 
-class ReefSpecialDataPdfSchema(ReefBaseSpecialDataSchema):
+class ReefSpecialDataPdfModel(ReefBaseSpecialDataModel):
     """A Reef Mini definition using PDF files."""
     
     type: Literal["reef:pdf"]
@@ -39,7 +38,7 @@ class ReefSpecialDataPdfSchema(ReefBaseSpecialDataSchema):
     pdf: ResourceLocation
     """Resource location pointing to the PDF file in `assets/<namespace>/reef/<path>`."""
     
-class ReefSpecialDataItemModelSchema(ReefBaseSpecialDataSchema):
+class ReefSpecialDataItemModelModel(ReefBaseSpecialDataModel):
     """A Reef Mini definition using an item model definition file."""
     
     type: Literal["reef:item_model"]
@@ -50,8 +49,8 @@ class ReefSpecialDataItemModelSchema(ReefBaseSpecialDataSchema):
 
 class ReefSpecialDataModel(RootModel[Annotated[
     Union[
-        ReefSpecialDataPdfSchema,
-        ReefSpecialDataItemModelSchema
+        ReefSpecialDataPdfModel,
+        ReefSpecialDataItemModelModel
     ],
     Field(discriminator="type")
 ]]):
@@ -68,7 +67,7 @@ def create_reef_special_data_namespace(ctx: Context, opts: ReefPluginOptions):
             super().bind(pack, path)
             
             namespace, _, path = path.partition(":")
-            json_info: ReefSpecialDataPdfSchema | ReefSpecialDataItemModelSchema = self.data.root
+            json_info: ReefSpecialDataPdfModel | ReefSpecialDataItemModelModel = self.data.root
             
             if json_info.type in ("reef:pdf", "reef:item_model"):
                 self.generate_reef_mini_functions(pack, namespace, path)
@@ -89,7 +88,7 @@ def create_reef_special_data_namespace(ctx: Context, opts: ReefPluginOptions):
             storage = f"{namespace}:reef"
             nbt_path = f'register.mini."{identifier}"'
             
-            json_info: ReefSpecialDataPdfSchema | ReefSpecialDataItemModelSchema = self.data.root
+            json_info: ReefSpecialDataPdfModel | ReefSpecialDataItemModelModel = self.data.root
             
             logger.debug("Building data %s", f"{namespace}:reef/{path}")
             

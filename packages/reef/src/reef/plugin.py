@@ -41,3 +41,5 @@ def reef(ctx: Context, opts: ReefPluginOptions):
 
 	ctx.require(assets.pdf)
 	ctx.require(data.special)
+	ctx.require(data.page)
+	ctx.require(data.slideshow)

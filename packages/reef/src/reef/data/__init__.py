@@ -1,5 +1,9 @@
 __all__ = [
-    "special"
+    "special",
+    "page",
+    "slideshow",
 ]
 
 from .special import *
+from .page import *
+from .slideshow import *
