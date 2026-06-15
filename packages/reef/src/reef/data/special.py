@@ -109,14 +109,19 @@ def create_reef_special_data_namespace(ctx: Context, opts: ReefPluginOptions):
                 case "reef:item_model":
                     mini_definition["model"] = json_info.item_model
             
-            pack[namespace].functions[f"reef/{path}/register_mini"] = Function([
+            function_contents = Function([
                 f'data modify storage {storage} {nbt_path} set value {json.dumps(mini_definition)}',
                 f'function reef:api/register/mini {{identifier: "{identifier}", storage_path: \'{storage} {nbt_path}\'}}'
             ])
             
-            register_main.append([
-                f"function {namespace}:reef/{path}/register_mini"
-            ])
+            if not opts.compress_functions:
+                pack[namespace].functions[f"reef/register/page/{path}"] = function_contents
+
+                register_main.append([
+                    f"function {namespace}:reef/register/page/{path}"
+                ])
+            else:
+                register_main.append(function_contents)
             
     return ReefSpecialData
 

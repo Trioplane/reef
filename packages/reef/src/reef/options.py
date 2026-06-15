@@ -7,6 +7,7 @@ class PdfPluginOptions(PluginOptions):
     
 class ReefPluginOptions(PluginOptions):
     tint: int | None = None
+    compress_functions: bool = False
     cache_timeout_hours: int = 24
 
     pdf: PdfPluginOptions = PdfPluginOptions()

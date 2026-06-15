@@ -53,16 +53,14 @@ class AnimatedGraphicElementModel(ElementBaseModel):
     model: models.ResourceLocation
     frames: int
     
-class ElementModel(RootModel[Annotated[
+ElementModel = Annotated[
     Union[
         GraphicElementModel,
         TextElementModel,
         AnimatedGraphicElementModel
     ],
     Field(discriminator="type")
-]]):
-    """See https://github.com/Trioplane/reef/wiki/definition_schemas#element"""
-    pass
+]
 
 class PageCommandsModel(BaseModel):
     on_load: list[str] | None = None
@@ -88,11 +86,44 @@ def create_reef_page_data_namespace(ctx: Context, opts: ReefPluginOptions):
             
             namespace, _, path = path.partition(":")
             
-            # TODO: implement code-gen for pages
-            # temp variable to trigger deserialization
-            _ = self.data
+            self.generate_reef_page_functions(pack, namespace, path)
                 
             raise Drop()
+        
+        def generate_reef_page_functions(
+            self,
+            pack: DataPack,
+            namespace: str,
+            path: str
+        ):
+            """Generate the page registry functions at <ns>:reef/register/page/<path>."""
+            
+            identifier = f"{namespace}:{path}"
+            storage = f"{namespace}:reef"
+            nbt_path = f'register.page."{identifier}"'
+            
+            json_info: PageModel = self.data
+
+            logger.debug("Building data %s", f"{namespace}:reef/{path}")
+            
+            log_prefix = ["", {"text": "[", "color": "#6e3787"}, {"text": "reef", "color": "#ed2de3"}, {"text": "] ", "color": "#6e3787"}]
+            register_main = pack[namespace].functions.setdefault("reef/register_namespace", Function([
+                f"tellraw @a[tag=reef.permissions.see_debug] {json.dumps([*log_prefix, {"text": f"Registering data for namespace '{namespace}'", "color": "#77d6ff"}])}",
+            ]))
+            
+            function_contents = Function([
+                f"data modify storage {storage} {nbt_path} set value {json_info.model_dump_json(exclude_none=True)}",
+                f'function reef:api/register/page {{identifier: "{identifier}", storage_path: \'{storage} {nbt_path}\'}}'
+            ])
+            
+            if not opts.compress_functions:
+                pack[namespace].functions[f"reef/register/page/{path}"] = function_contents
+
+                register_main.append([
+                    f"function {namespace}:reef/register/page/{path}"
+                ])
+            else:
+                register_main.append(function_contents)
         
     return ReefPageData
 

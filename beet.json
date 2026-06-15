@@ -28,6 +28,7 @@
             "prelude": "reef:prelude"
         },
         "reef": {
+            "compress_functions": true,
             "tint": 66046,
             "pdf": {
                 "dpi": 144
