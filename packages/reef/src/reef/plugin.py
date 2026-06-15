@@ -43,3 +43,4 @@ def reef(ctx: Context, opts: ReefPluginOptions):
 	ctx.require(data.special)
 	ctx.require(data.page)
 	ctx.require(data.slideshow)
+	ctx.require(data.transition)
