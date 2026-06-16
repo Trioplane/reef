@@ -2,25 +2,6 @@ from reef:main import LOGGER
 from reef:main import DEV_LOGGER
 from bolt_expressions import Scoreboard, Data
 
-class PerformanceStopwatch:
-    def __init__(self, id):
-        self.id = id
-        stopwatch create self.id
-
-    def start(self):
-        stopwatch restart self.id
-
-    def stop(self):
-        execute store result score stopwatch trplnr.debug run stopwatch query self.id 10000
-
-    def log(self):
-        execute store result storage trplnr:debug stopwatch float 0.0001 run scoreboard players get stopwatch trplnr.debug
-        DEV_LOGGER.info("@a", [f"{self.id} took ", {storage: "trplnr:debug", nbt: "stopwatch"}, " seconds"])
-
-    def stop_and_log(self):
-        self.stop()
-        self.log()
-
 class IDFunction:
     def __init__(self, name):
         self.score_name = f"reef.zzzinternals.{name}.id"
@@ -122,31 +103,31 @@ function ~/tick:
 
 function ~/register/slideshow:
     # @args (identifier, storage_path)
-    $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/slideshow/errors/slideshow_not_found
-    function ~/errors/slideshow_not_found:
-        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Slideshow data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, "."])
+    $execute unless data storage $(storage_path) run return run function reef:zzzinternals/errors/slideshow_not_found
+    function reef:zzzinternals/errors/slideshow_not_found:
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", [{"text": "Slideshow data was not found "}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}]}}])
 
     $data remove storage reef.zzzinternals:registry slideshow."$(identifier)"
     $data modify storage reef.zzzinternals:registry slideshow."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Slideshow data ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.identifier"}])
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", [{"text": "Registered slideshow "}, {storage: "reef.zzzinternals:in", nbt: "register.slideshow.identifier"}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, "\n", "Identifier: ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.identifier"}]}}])
 
 function ~/register/page:
     $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/page/errors/page_not_found
     function ~/errors/page_not_found:
-        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Page data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.page.storage_path"}, "."])
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", [{"text": "Page data was not found "}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.page.storage_path"}]}}])
 
     $data remove storage reef.zzzinternals:registry page."$(identifier)"
     $data modify storage reef.zzzinternals:registry page."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Page data ", {storage: "reef.zzzinternals:in", nbt: "register.page.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.page.identifier"}])
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", [{"text": "Registered page "}, {storage: "reef.zzzinternals:in", nbt: "register.page.identifier"}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.page.storage_path"}, "\n", "Identifier: ", {storage: "reef.zzzinternals:in", nbt: "register.page.identifier"}]}}])
 
 function ~/register/transition:
     $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/transition/errors/transition_not_found
     function ~/errors/transition_not_found:
-        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Transition data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, "."])
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", [{"text": "Transition data was not found "}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}]}}])
 
     $data remove storage reef.zzzinternals:registry transition."$(identifier)"
     $data modify storage reef.zzzinternals:registry transition."$(identifier)" set from storage $(storage_path)
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Transition data ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}])
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", [{"text": "Registered transition "}, {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, "\n", "Identifier: ", {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}]}}])
 
 function ~/register/transition/keywords:
     def addKeyword(id, builtin_transition, options={}):
@@ -164,7 +145,7 @@ function ~/register/transition/keywords:
 function ~/register/mini:
     $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/mini/errors/definition_not_found
     function ~/errors/definition_not_found:
-        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Mini slideshow data was not found at ", {storage: "reef.zzzinternals:in", nbt: "register.slideshow.storage_path"}, "."])
+        LOGGER.error("@a[tag=reef.permissions.see_debug]", [{"text": "Mini data was not found "}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.mini.storage_path"}]}}])
 
     MiniScore = Scoreboard.objective("reef.zzzinternals.register.mini")
     InStorage = Data.storage("reef.zzzinternals:in").register.mini
@@ -206,8 +187,7 @@ function ~/register/mini:
         MiniData.current_page = MiniScore[".current_page"]
         function ~/ with var MiniData
 
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Mini slideshow data ", {storage: "reef.zzzinternals:in", nbt: "register.mini.storage_path"}, " successfully registered as ", {storage: "reef.zzzinternals:in", nbt: "register.mini.identifier"}])
-
+    LOGGER.info("@a[tag=reef.permissions.see_debug]", [{"text": "Registered mini "}, {storage: "reef.zzzinternals:in", nbt: "register.mini.identifier"}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.mini.storage_path"}, "\n", "Identifier: ", {storage: "reef.zzzinternals:in", nbt: "register.mini.identifier"}]}}])
 # ------------------------------
 
 IDFunction("screen")
@@ -228,9 +208,6 @@ function ~/screen/setup_entity:
 
     # stop from transitioning immediately
     tag @s add reef.screen.transition.finished
-
-    #data modify entity @s data.reef.screen.slideshow.current.transition_data set value {}
-    #data modify entity @s data.reef.screen.slideshow.current.sequence_data set value {}
 
 function ~/screen/load_slideshow:
     """
@@ -270,7 +247,7 @@ function ~/screen/load_slideshow:
     function reef:zzzinternals/screen/transition_to_page
 
     DEV_LOGGER.info("@a", "put unpacked slideshow to entity slideshow data")
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", ["Successfuly loaded slideshow data to screen ID #", {score: {name: "@s", objective: "reef.zzzinternals.screen.id"}}])
+    LOGGER.info("@a[tag=reef.permissions.see_debug, tag=reef.player.remote_user.temp]", ["Successfuly loaded slideshow data to screen ID #", {score: {name: "@s", objective: "reef.zzzinternals.screen.id"}}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Screen position: ", {"entity": "@s", "nbt": "Pos"}]}}])
 
 function ~/screen/cut_to_page:
     Self = Data.entity("@s")
@@ -320,7 +297,7 @@ function ~/screen/transition_to_page:
 
 function ~/screen/has_finished_transition:
     execute if entity @s[tag=reef.screen.transition.finished] run return 1
-    LOGGER.warn("@a[tag=reef.permissions.see_debug]", "Please wait for the transition to finish.")
+    LOGGER.warn("@p[tag=reef.permissions.see_debug,tag=reef.player.remote_user.temp]", "Please wait for the transition to finish.")
     return fail
 
 function ~/screen/load_page:
@@ -333,14 +310,14 @@ function ~/screen/load_page:
 
     function ~/errors/page_number_lt0:
         scoreboard players operation @s reef.zzzinternals.screen.slideshow.switch_to_page = @s reef.zzzinternals.screen.slideshow.current_page
-        LOGGER.error("@a[tag=reef.permissions.see_debug]", "Slideshow page number cannot be less than 0")
+        LOGGER.error("@p[tag=reef.permissions.see_debug,tag=reef.player.remote_user.temp]", "Slideshow page number cannot be less than 0")
         return fail
 
     function ~/errors/page_number_gtpages:
         scoreboard players operation @s reef.zzzinternals.screen.slideshow.switch_to_page = @s reef.zzzinternals.screen.slideshow.current_page
         scoreboard players operation #tmp reef.zzzinternals.screen.slideshow.pages = @s reef.zzzinternals.screen.slideshow.pages
         scoreboard players remove #tmp reef.zzzinternals.screen.slideshow.pages 1
-        LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Slideshow page index cannot exceed page bounds (", {score: {name: "#tmp", objective: "reef.zzzinternals.screen.slideshow.pages"}}, ")"])
+        LOGGER.error("@p[tag=reef.permissions.see_debug,tag=reef.player.remote_user.temp]", ["Slideshow page index cannot exceed page bounds (", {score: {name: "#tmp", objective: "reef.zzzinternals.screen.slideshow.pages"}}, ")"])
         return fail
 
     execute if score @s reef.zzzinternals.screen.slideshow.switch_to_page matches ..-1 run return run function ~/errors/page_number_lt0
@@ -379,7 +356,7 @@ function ~/screen/load_page:
 
 function ~/screen/has_loaded_slideshow:
     execute if data entity @s data.reef.screen.slideshow run return 1
-    LOGGER.error("@a[tag=reef.permissions.see_debug]", "No slideshow loaded. Use a remote and open the slideshow settings to load a slideshow.")
+    LOGGER.error("@p[tag=reef.permissions.see_debug,tag=reef.player.remote_user.temp]", "No slideshow loaded. Use a remote and open the slideshow settings to load a slideshow.")
     return fail
 
 function ~/screen/thy_shall_prepare_to_burn_the_witches:
@@ -658,7 +635,7 @@ function ~/screen/display/transition:
             return run function reef:zzzinternals/screen/display/transition/run_builtin/:
                 execute if data storage reef.zzzinternals:tmp root.transition{_builtin: "wipe"} run return run function reef:zzzinternals/screen/display/transition/builtin/wipe
 
-                LOGGER.error("@a", "Unknown builtin transition.")
+                LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Unknown builtin transition.", {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Screen position: ", {"entity": "@s", "nbt": "Pos"}]}}])
 
         tag @s remove reef.element.transition.finished
 

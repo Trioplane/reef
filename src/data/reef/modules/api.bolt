@@ -40,8 +40,24 @@ function ~/screen/summon:
     particle minecraft:dust_color_transition{from_color:[0.8,0.8,1],to_color:[0.4,0.2,0.6],scale:1} ~ ~ ~ 0 0 0 0.2 10 normal @a[tag=reef.permissions.see_debug]
     playsound minecraft:block.amethyst_block.resonate master @a[tag=reef.permissions.see_debug] ~ ~ ~ 0.5 
 
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", "Screen summoned!")
-    LOGGER.info("@a[tag=reef.permissions.see_debug]", "To rotate the screen, modify the `Rotation` tag instead of `transformation`.")
+    LOGGER.info(
+        "@a[tag=reef.permissions.see_debug]",
+        [
+            "Screen summoned!",
+            {
+                "text": " (hover for more info)",
+                "color": "dark_gray",
+                "hover_event": {
+                    "action": "show_text",
+                    "value": [
+                        "Location: ", {"entity": "@n[tag=reef.screen, distance=..5]", "nbt": "Pos"}, "\n",
+                        "ID: #", {"score": {"name": "@n[tag=reef.screen, distance=..5]", "objective": "reef.zzzinternals.screen.id"}}, "\n\n",
+                        {"text": "To rotate the screen, modify the `Rotation` tag instead of `transformation`.", "color": "#77d6ff"}
+                    ]
+                }
+            }
+        ],
+    )
 
 function ~/screen/set_page:
     execute unless function reef:zzzinternals/screen/has_loaded_slideshow run return fail
@@ -375,7 +391,9 @@ function ~/remote/linked_remote/next:
         LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
+    tag @s add reef.player.remote_user.temp
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/next
+    tag @s remove reef.player.remote_user.temp
     DEV_LOGGER.info("@a", "~/remote/next")
 
 function ~/remote/linked_remote/prev:
@@ -383,7 +401,9 @@ function ~/remote/linked_remote/prev:
         LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
+    tag @s add reef.player.remote_user.temp
     execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/prev
+    tag @s remove reef.player.remote_user.temp
     DEV_LOGGER.info("@a", "~/remote/prev")
 
 function ~/remote/linked_remote/open_slideshow_settings:
@@ -509,6 +529,7 @@ function ~/remote/linked_remote/open_slideshow_settings:
                 }
             ],
             "pause": false,
+
             "actions": [
                 {
                     "label": {
@@ -559,6 +580,7 @@ function ~/remote/linked_remote/open_slideshow_settings:
                 }
             ],
             "pause": false,
+
             "actions": [
                 {
                     "label": {
@@ -580,7 +602,9 @@ function ~/remote/linked_remote/load_slideshow:
         LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
+    tag @s add reef.player.remote_user.temp
     $execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:zzzinternals/screen/load_slideshow {id: '$(id)'}
+    tag @s remove reef.player.remote_user.temp
     DEV_LOGGER.info("@s", "LINKED_REMOTE/LOAD_SLIDESHOW")
 
 function ~/remote/linked_remote/change_page:
@@ -588,7 +612,9 @@ function ~/remote/linked_remote/change_page:
         LOGGER.error("@s", ["You are not allowed to use this item. ", {text: "(Missing permissions: reef.permissions.use_remote)", color: "dark_gray"}])
     function ~/../load_remote_data
     execute unless function ~/../prepare_screen_link run return fail
+    tag @s add reef.player.remote_user.temp
     $execute as @n[type=item_display,tag=reef.screen,predicate=reef:zzzinternals/id_link/screen] run function reef:api/screen/set_page {page: $(page)}
+    tag @s remove reef.player.remote_user.temp
     DEV_LOGGER.info("@s", "LINKED_REMOTE/CHANGE_PAGE")
 
 function ~/remote/linked_remote/clear_screen:
