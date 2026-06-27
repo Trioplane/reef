@@ -7,11 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta5] - 2026-06-27
+
+## Changed
+- README.md
+
+## [1.0.0-beta4] - 2026-06-27
+
 ### Added
 - Reef Slideshow namespace (`data/ns/reef/slideshow`) that generates registry functions.
 - Reef Page namespace (`data/ns/reef/page`) that generates registry functions.
 - Reef Transition namespace (`data/ns/reef/transition`) that generates registry functions.
 - `compress_functions` plugin option to put all registry code for a namespace into one file.
+
+### Changed
+- Updated beet to 0.166.0
 
 ## [1.0.0-beta3] - 2026-06-07
 

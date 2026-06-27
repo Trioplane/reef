@@ -13,8 +13,8 @@ Reef is a presentation library used to create stunning presentations in vanilla 
 - ❌ Google Slides Generation (assets|data/ns/reef/gslides)
   * ❌ Asset Generation (textures, models, item models)
   * ❌Data Generation (slideshow, pages, and transition definition functions and register functions)
-- ❌ Manual JSON registry files (data/ns/reef/slideshow|page|transition)
-  * ❌ Data Generation
+- ✅ Manual JSON registry files (data/ns/reef/slideshow|page|transition)
+  * ✅ Data Generation
 
 ## Changelog
 See the full changelog at [CHANGELOG.md](https://github.com/Trioplane/reef/blob/main/packages/reef/CHANGELOG.md).
