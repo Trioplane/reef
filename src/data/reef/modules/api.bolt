@@ -31,6 +31,11 @@ function ~/register/mini:
     $data modify storage reef.zzzinternals:in register.mini set value {identifier: '$(identifier)', storage_path: '$(storage_path)'}
     function reef:zzzinternals/register/mini with storage reef.zzzinternals:in register.mini
 
+function ~/clear_registry:
+    data remove storage reef.zzzinternals:registry page
+    data remove storage reef.zzzinternals:registry slideshow
+    data remove storage reef.zzzinternals:registry transition
+    LOGGER.info("@s", "Cleared reef registry.")
 
 function ~/screen/summon:
     execute summon item_display run function reef:zzzinternals/screen/setup_entity
@@ -242,8 +247,7 @@ predicate reef:item/linked_remote/use_type/primary {
     "condition": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
-        "type_specific": {
-            "type": "minecraft:player",
+        "minecraft:type_specific/player": {
             "input": {
                 "sneak": false,
                 "sprint": false
@@ -255,8 +259,7 @@ predicate reef:item/linked_remote/use_type/secondary {
     "condition": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
-        "type_specific": {
-            "type": "minecraft:player",
+        "minecraft:type_specific/player": {
             "input": {
                 "sneak": true,
                 "sprint": false
@@ -268,8 +271,7 @@ predicate reef:item/linked_remote/use_type/tertiary {
     "condition": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
-        "type_specific": {
-            "type": "minecraft:player",
+        "minecraft:type_specific/player": {
             "input": {
                 "sneak": true,
                 "sprint": true

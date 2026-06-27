@@ -52,4 +52,4 @@ G_ENVIRONMENT_TYPES = {
     "production": Environment(name="production", options=EnvironmentOptions(dev_logs=False)),
     "summit": Environment(name="summit", options=EnvironmentOptions(dev_logs=False))
 }
-G_ENVIRONMENT = G_ENVIRONMENT_TYPES.production
+G_ENVIRONMENT = G_ENVIRONMENT_TYPES.development

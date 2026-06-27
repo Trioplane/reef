@@ -1,0 +1,21 @@
+{
+    "transition": "reef:blue_slide_up",
+    "sequence": [
+        [{
+            "type": "graphic",
+            "model": "reef:graphic/yellow_gradient",
+            "pos": [0, 0, -0.01]
+        }, {
+            "type": "text",
+            "text": {"text": "Animated Graphic Elements", "color": "black"},
+            "pos": [16.5, -6, 0],
+            "scale": [5, 5, 1]
+        }],
+        [{
+            "type": "animated_graphic",
+            "model": "reef:animated_graphic/animation_text",
+            "frames": 37,
+            "pos": [13.5, -9, 0]
+        }]
+    ]
+}

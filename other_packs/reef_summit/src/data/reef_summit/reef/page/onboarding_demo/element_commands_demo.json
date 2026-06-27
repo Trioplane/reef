@@ -1,0 +1,29 @@
+{
+    "transition": "reef:blue_slide_up",
+    "sequence": [
+        [{
+            "type": "graphic",
+            "model": "reef:graphic/yellow_gradient",
+            "pos": [0, 0, -0.01]
+        }, {
+            "type": "text",
+            "text": {"text": "Element Commands Demo", "color": "black"},
+            "pos": [16.5, -6, 0],
+            "scale": [5, 5, 1]
+        }],
+        [{
+            "type": "text",
+            "text": {"text": "BOO!", "color": "black", "bold": true},
+            "pos": [16.5, -9, 0],
+            "line_width": 200,
+            "scale": [3, 3, 1],
+            "commands": {
+                "on_enter": [
+                    "title @a[distance=..100] title 'BOO! 👻'",
+                    "particle minecraft:elder_guardian ~ ~ ~ 0 0 0 1 1 force @a[distance=..100]"
+                ],
+                "on_exit": ["particle poof ~ ~ ~ 1 1 1 1 100 force @a[distance=..100]"]
+            }
+        }]
+    ]
+}

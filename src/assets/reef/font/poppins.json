@@ -1,9 +1,0 @@
-{
-    "providers": [{
-        "type": "ttf",
-        "file": "reef:ttf/poppins_regular.ttf",
-        "shift": [0, 0],
-        "size": 11,
-        "oversample": 4
-    }]
-}

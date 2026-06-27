@@ -1,0 +1,15 @@
+{
+    "transition": "reef:smithed_slide_up",
+    "sequence": [
+        [{
+            "type": "graphic",
+            "model": "reef:graphic/yellow_gradient",
+            "pos": [0, 0, -0.01]
+        }, {
+            "type": "text",
+            "text": {"text": "Reef outro screen, very nice right", "color": "black"},
+            "pos": [16.5, -9, 0],
+            "scale": [5, 5, 1]
+        }]
+    ]
+}

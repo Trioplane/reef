@@ -1,0 +1,14 @@
+[
+    "reef:onboarding_demo/intro",
+    "reef:onboarding_demo/what_is_reef",
+    "reef:onboarding_demo/what_can_reef_do",
+    "reef:onboarding_demo/text_element_demo/part_1",
+    "reef:onboarding_demo/text_element_demo/part_2",
+    "reef:onboarding_demo/graphic_element_demo",
+    "reef:onboarding_demo/animated_graphic_demo",
+    "reef:onboarding_demo/page_commands",
+    "reef:onboarding_demo/element_commands",
+    "reef:onboarding_demo/element_commands_demo",
+    "reef:onboarding_demo/how_to_make",
+    "reef:onboarding_demo/outro"
+]

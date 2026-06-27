@@ -1,0 +1,16 @@
+from reef:element import GraphicElement, AnimatedGraphicElement, TransitionElement
+
+AnimatedGraphicElement(
+    id=f"reef:animated_graphic/animation_text",
+    texture=f"reef:animated_graphic/animation_text",
+    size=(128, 64),
+    frames=37
+).create_model().create_item_definition()
+
+GraphicElement(
+    id=f"reef:graphic/yellow_gradient",
+    texture=f"reef:graphic/yellow_gradient",
+    size=(528, 288)
+).create_model().create_item_definition()
+
+# todo: update reef-beet-plugin to support asset element definitions

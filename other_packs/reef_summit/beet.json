@@ -1,0 +1,38 @@
+{
+    "author": "Trplnr",
+    "name": "Reef Summit Testing",
+    "description": "Demo and testing reef slideshows for Smithed Summit",
+    "version": "1.0.0",
+    "minecraft": "26.2",
+    "data_pack": {
+        "load": ["src"],
+        "min_format": [107,1],
+        "max_format": [107,1]
+    },
+    "resource_pack": {
+        "load": ["src"],
+        "min_format": [88,0],
+        "max_format": [88,0]
+    },
+    "pipeline": ["mecha"],
+    "require": [
+        "reef",
+        "bolt",
+        "bolt_expressions",
+        "bolt_native_macros",
+        "beet.contrib.livereload"
+    ],
+    "meta": {
+        "bolt": {
+            "entrypoint": "reef_summit:*"
+        },
+        "reef": {
+            "compress_functions": true,
+            "tint": 66046,
+            "pdf": {
+                "dpi": 144
+            }
+        }
+    },
+    "output": "build"
+}

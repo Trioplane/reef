@@ -1,0 +1,40 @@
+{
+    "transition": "reef:blue_slide_up",
+    "sequence": [
+        [{
+            "type": "graphic",
+            "model": "reef:graphic/yellow_gradient",
+            "pos": [0, 0, -0.01]
+        }, {
+            "type": "text",
+            "text": {"text": "Graphic Elements", "color": "black"},
+            "pos": [16.5, -6, 0],
+            "scale": [5, 5, 1]
+        }],
+        [{
+            "type": "graphic",
+            "model": "minecraft:stone",
+            "pos": [12.5, -9, 0],
+            "scale": [3, 3, 0.01]
+        }],
+        [{
+            "type": "graphic",
+            "model": "reef:element_base",
+            "pos": [16.5, -9, 0],
+            "scale": [2, 3, 0.01]
+        }, {
+            "type": "text",
+            "text": {"text": "The missing texture is intentional", "color": "black"},
+            "pos": [16.5, -11, 0],
+            "scale": [2, 2, 1]
+        }],
+        [{
+            "type": "graphic",
+            "model": "minecraft:player_head",
+            "components": {"minecraft:profile": "Trplnr"},
+            "pos": [20.5, -9, 0],
+            "scale": [3, 3, 0.01],
+            "left_rotation": [0, 1, 0, 0]
+        }]
+    ]
+}

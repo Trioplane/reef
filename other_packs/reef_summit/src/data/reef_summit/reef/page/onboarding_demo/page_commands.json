@@ -1,0 +1,22 @@
+{
+    "transition": "reef:blue_slide_up",
+    "sequence": [
+        [{
+            "type": "graphic",
+            "model": "reef:graphic/yellow_gradient",
+            "pos": [0, 0, -0.01]
+        }, {
+            "type": "text",
+            "text": {"text": "Page Commands", "color": "black"},
+            "pos": [16.5, -6, 0],
+            "scale": [5, 5, 1]
+        }],
+        [{
+            "type": "text",
+            "text": {"text": "Events: `on_load`, `on_enter`, `on_unload`", "color": "black"},
+            "pos": [16.5, -9, 0],
+            "line_width": 200,
+            "scale": [3, 3, 1]
+        }]
+    ]
+}

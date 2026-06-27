@@ -1,0 +1,23 @@
+{
+    "transition": "reef:blue_slide_up",
+    "sequence": [
+        [{
+            "type": "graphic",
+            "model": "reef:graphic/yellow_gradient",
+            "pos": [0, 0, -0.01]
+        }],
+        [{
+            "type": "text",
+            "text": [
+                {"selector": "@r", "color": "black"}, " gets a cookie \n",
+                {"selector": "@r", "color": "black"}, " doesn't get a cookie \n",
+                {"selector": "@r", "color": "black"}, " might get a cookie? \n",
+                {"selector": "@r", "color": "black"}, " will leak their session token cookie \n"
+            ],
+            "alignment": "left",
+            "line_width": 1000,
+            "pos": [16.5, -12, 0],
+            "scale": [4, 4, 1]
+        }]
+    ]
+}

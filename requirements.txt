@@ -1,5 +1,5 @@
 annotated-types==0.7.0
-beet==0.115.0
+beet==0.116.0
 bolt==0.50.1
 bolt-expressions==0.19.2
 bolt-native-macros==0.5.1
@@ -38,7 +38,8 @@ pyproject_hooks==1.2.0
 pywin32-ctypes==0.2.3
 PyYAML==6.0.3
 readme_renderer==44.0
-reef-beet-plugin==1.0.0b3
+-e git+https://github.com/Trioplane/reef.git@bf1a06a7163a833ddc36157cd9f09b6618becb66#egg=reef&subdirectory=packages\reef
+-e git+https://github.com/Trioplane/reef.git@bf1a06a7163a833ddc36157cd9f09b6618becb66#egg=reef_beet_plugin&subdirectory=packages\reef
 requests==2.34.2
 requests-toolbelt==1.0.0
 rfc3986==2.0.0
