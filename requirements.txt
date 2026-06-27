@@ -22,7 +22,7 @@ keyring==25.7.0
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
-mecha==0.103.0
+mecha==0.104.0
 more-itertools==11.1.0
 nbtlib==1.12.1
 nh3==0.3.5
@@ -38,8 +38,8 @@ pyproject_hooks==1.2.0
 pywin32-ctypes==0.2.3
 PyYAML==6.0.3
 readme_renderer==44.0
--e git+https://github.com/Trioplane/reef.git@bf1a06a7163a833ddc36157cd9f09b6618becb66#egg=reef&subdirectory=packages\reef
--e git+https://github.com/Trioplane/reef.git@bf1a06a7163a833ddc36157cd9f09b6618becb66#egg=reef_beet_plugin&subdirectory=packages\reef
+-e git+https://github.com/Trioplane/reef.git@36f858195ac2ae0f2878b23a8d98f3aacd1d88dd#egg=reef&subdirectory=packages\reef
+reef-beet-plugin==1.0.0b5
 requests==2.34.2
 requests-toolbelt==1.0.0
 rfc3986==2.0.0
