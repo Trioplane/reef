@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - *nothing yet...* 
 
+## [1.0.0-beta7] - 2026-06-28
+
+### Fixed
+
+- Environment changed back to production.
+
 ## [1.0.0-beta6] - 2026-06-27
 
 ### Added
