@@ -1,5 +1,7 @@
 __all__ = [
-    "pdf"
+    "element",
+    "pdf",
 ]
 
 from .pdf import *
+from .element import *

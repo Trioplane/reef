@@ -2,10 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.0.0-beta6] - 2026-06-28
+
+## Added
+- Reef Element asset namespace (`assets/ns/reef/element`) that generates models and item model definitions to use in Reef slideshows.
+  * `reef:graphic` Reef Element type.
+  * `reef:animated_element` Reef Element type.
 
 ## [1.0.0-beta5] - 2026-06-27
 

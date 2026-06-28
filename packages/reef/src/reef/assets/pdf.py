@@ -33,7 +33,7 @@ def create_reef_pdf_asset_namespace(ctx: Context, opts: ReefPluginOptions):
     class ReefPdfAsset(File):
         """Class representing a Reef PDF file."""
 
-        scope: ClassVar[NamespaceFileScope] = ("reef",)
+        scope: ClassVar[NamespaceFileScope] = ("reef", "pdf")
         extension: ClassVar[str] = ".pdf"
         poppler_path: dict[str, Any] = {"poppler_path": opts.pdf.poppler_path} if opts.pdf.poppler_path is not None else {}
 

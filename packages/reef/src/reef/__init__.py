@@ -1,4 +1,4 @@
-__version__ = "1.0.0-beta5"
+__version__ = "1.0.0-beta6"
 
 __all__ = [
     "reef"

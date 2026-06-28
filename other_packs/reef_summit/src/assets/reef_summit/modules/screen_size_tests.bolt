@@ -1,190 +1,190 @@
-from reef:element import GraphicElement, AnimatedGraphicElement, TransitionElement, MiniSlideshow
+# from reef:element import GraphicElement, AnimatedGraphicElement, TransitionElement, MiniSlideshow
 
-screen_sizes = [(528, 288), (400, 224), (336, 192)]
+# screen_sizes = [(528, 288), (400, 224), (336, 192)]
 
-function ~/define_test_values:
-    MiniSlideshow(
-        id="reef:reef_mini_test", 
-        texture="reef:mini/reef_mini_test",
-        size=(64, 36),
-        page_count=5
-    ).create_model().create_item_definition()
+# function ~/define_test_values:
+#     MiniSlideshow(
+#         id="reef:reef_mini_test", 
+#         texture="reef:mini/reef_mini_test",
+#         size=(64, 36),
+#         page_count=5
+#     ).create_model().create_item_definition()
 
-    data modify storage reef.test:registry mini."reef.test:reef_mini_test" set value {
-        model: "reef:reef_mini_test",
-        page_count: 5
-    }
+#     data modify storage reef.test:registry mini."reef.test:reef_mini_test" set value {
+#         model: "reef:reef_mini_test",
+#         page_count: 5
+#     }
 
-    function reef:api/register/mini {identifier: "reef.test:reef_mini_test", storage_path: 'reef.test:registry mini."reef.test:reef_mini_test"'}
+#     function reef:api/register/mini {identifier: "reef.test:reef_mini_test", storage_path: 'reef.test:registry mini."reef.test:reef_mini_test"'}
 
-    for i in range(1, 3+1):
-        AnimatedGraphicElement(
-            id=f"reef:animated_graphic/screen_{i}",
-            texture=f"reef:animated_graphic/screen_{i}",
-            size=(90, 14),
-            frames=9
-        ).create_model().create_item_definition()
+#     for i in range(1, 3+1):
+#         AnimatedGraphicElement(
+#             id=f"reef:animated_graphic/screen_{i}",
+#             texture=f"reef:animated_graphic/screen_{i}",
+#             size=(90, 14),
+#             frames=9
+#         ).create_model().create_item_definition()
 
-        screen_size = f"{screen_sizes[i-1][0]}x{screen_sizes[i-1][1]}"
+#         screen_size = f"{screen_sizes[i-1][0]}x{screen_sizes[i-1][1]}"
 
-        data modify storage reef.test:registry f'slideshow."reef.test:screen_{i}"' set value [
-            f"reef.test:screen_{i}/intro",
-            f"reef.test:screen_{i}/resolution_test",
-            f"reef.test:screen_{i}/screen_info",
-            f"reef.test:screen_{i}/outro",
-            f"reef.test:screen_{i}/post_outro",
-        ]
+#         data modify storage reef.test:registry f'slideshow."reef.test:screen_{i}"' set value [
+#             f"reef.test:screen_{i}/intro",
+#             f"reef.test:screen_{i}/resolution_test",
+#             f"reef.test:screen_{i}/screen_info",
+#             f"reef.test:screen_{i}/outro",
+#             f"reef.test:screen_{i}/post_outro",
+#         ]
 
-        data modify storage reef.test:registry f'page."reef.test:screen_{i}/intro"' set value {
-            transition: f"reef.test:blue_slide_up/{screen_size}",
-            sequence: [
-                [{
-                    type: "graphic",
-                    model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
-                    pos: [0, 0, -0.01],
-                }],
-                [{
-                    type: "animated_graphic",
-                    model: f"reef:animated_graphic/screen_{i}",
-                    frames: 9,
-                    pos: [3, -3, 0],
-                    scale: [2, 2, 1]
-                }]
-            ]
-        }
+#         data modify storage reef.test:registry f'page."reef.test:screen_{i}/intro"' set value {
+#             transition: f"reef.test:blue_slide_up/{screen_size}",
+#             sequence: [
+#                 [{
+#                     type: "graphic",
+#                     model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
+#                     pos: [0, 0, -0.01],
+#                 }],
+#                 [{
+#                     type: "animated_graphic",
+#                     model: f"reef:animated_graphic/screen_{i}",
+#                     frames: 9,
+#                     pos: [3, -3, 0],
+#                     scale: [2, 2, 1]
+#                 }]
+#             ]
+#         }
 
-        data modify storage reef.test:registry f'page."reef.test:screen_{i}/resolution_test"' set value {
-            commands: {
-                on_load: ['tellraw @a "PAGE ON LOAD"'],
-                on_enter: ['tellraw @a "PAGE ON ENTER"'],
-                on_unload: ['tellraw @a "PAGE ON UNLOAD"'],
-            },
-            transition: f"reef.test:blue_slide_up/{screen_size}",
-            sequence: [[{
-                type: "graphic",
-                model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
-                pos: [0, 0, 0],
-                commands: {
-                    on_enter: ['tellraw @a "ELEMENT ON ENTER"'],
-                    on_exit: ['tellraw @a "ELEMENT ON EXIT"'],
-                }
-            }]]
-        }
+#         data modify storage reef.test:registry f'page."reef.test:screen_{i}/resolution_test"' set value {
+#             commands: {
+#                 on_load: ['tellraw @a "PAGE ON LOAD"'],
+#                 on_enter: ['tellraw @a "PAGE ON ENTER"'],
+#                 on_unload: ['tellraw @a "PAGE ON UNLOAD"'],
+#             },
+#             transition: f"reef.test:blue_slide_up/{screen_size}",
+#             sequence: [[{
+#                 type: "graphic",
+#                 model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
+#                 pos: [0, 0, 0],
+#                 commands: {
+#                     on_enter: ['tellraw @a "ELEMENT ON ENTER"'],
+#                     on_exit: ['tellraw @a "ELEMENT ON EXIT"'],
+#                 }
+#             }]]
+#         }
 
-        data modify storage reef.test:registry f'page."reef.test:screen_{i}/screen_info"' set value {
-            transition: f"reef.test:blue_slide_up/{screen_size}",
-            sequence: [
-                [
-                    {
-                        type: "graphic",
-                        model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
-                        pos: [0, 0, -0.01],
-                    },
-                    {
-                        type: "text",
-                        text: {text: "Screen Info", font: "reef:poppins"},
-                        alignment: "left",
-                        pos: [3, -3, 0],
-                        scale: [3, 3, 1]
-                    },
-                ],
-                [{
-                    type: "text",
-                    text: {text: f"Size: {screen_size}\nBackground: reef:graphic/animated_checkerboard_background/{screen_size}", font: "reef:poppins"},
-                    width: 500,
-                    alignment: "left",
-                    pos: [11, -4.5, 0],
-                    scale: [2, 2, 1]
-                }],
-                [{
-                    type: "text",
-                    text: {text: "that's basically it", italic: true, font: "reef:poppins"},
-                    width: 500,
-                    alignment: "left",
-                    pos: [3, -5, 0],
-                    scale: [2, 2, 1]
-                }],
-            ]
-        }
+#         data modify storage reef.test:registry f'page."reef.test:screen_{i}/screen_info"' set value {
+#             transition: f"reef.test:blue_slide_up/{screen_size}",
+#             sequence: [
+#                 [
+#                     {
+#                         type: "graphic",
+#                         model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
+#                         pos: [0, 0, -0.01],
+#                     },
+#                     {
+#                         type: "text",
+#                         text: {text: "Screen Info", font: "reef:poppins"},
+#                         alignment: "left",
+#                         pos: [3, -3, 0],
+#                         scale: [3, 3, 1]
+#                     },
+#                 ],
+#                 [{
+#                     type: "text",
+#                     text: {text: f"Size: {screen_size}\nBackground: reef:graphic/animated_checkerboard_background/{screen_size}", font: "reef:poppins"},
+#                     width: 500,
+#                     alignment: "left",
+#                     pos: [11, -4.5, 0],
+#                     scale: [2, 2, 1]
+#                 }],
+#                 [{
+#                     type: "text",
+#                     text: {text: "that's basically it", italic: true, font: "reef:poppins"},
+#                     width: 500,
+#                     alignment: "left",
+#                     pos: [3, -5, 0],
+#                     scale: [2, 2, 1]
+#                 }],
+#             ]
+#         }
 
-        data modify storage reef.test:registry f'page."reef.test:screen_{i}/outro"' set value {
-            sequence: [
-                [
-                    {
-                        type: "graphic",
-                        model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
-                        pos: [0, 0, -0.01],
-                    },
-                    {
-                        type: "text",
-                        text: [{text: "Fin", font: "reef:poppins"}, {text: "🦈🦈🦈", font: "default"}],
-                        pos: [3, -3, 0],
-                        scale: [3, 3, 1]
-                    }
-                ]
-            ]
-        }
+#         data modify storage reef.test:registry f'page."reef.test:screen_{i}/outro"' set value {
+#             sequence: [
+#                 [
+#                     {
+#                         type: "graphic",
+#                         model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
+#                         pos: [0, 0, -0.01],
+#                     },
+#                     {
+#                         type: "text",
+#                         text: [{text: "Fin", font: "reef:poppins"}, {text: "🦈🦈🦈", font: "default"}],
+#                         pos: [3, -3, 0],
+#                         scale: [3, 3, 1]
+#                     }
+#                 ]
+#             ]
+#         }
 
-        data modify storage reef.test:registry f'page."reef.test:screen_{i}/post_outro"' set value {
-            sequence: [
-                [
-                    {
-                        type: "graphic",
-                        model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
-                        pos: [0, 0, -0.01],
-                    },
-                    {
-                        type: "text",
-                        text: [{text: "fish", font: "reef:poppins"}, {text: "🐟🐟🐟", font: "default"}],
-                        pos: [3, -3, 0],
-                        scale: [3, 3, 1]
-                    }
-                ]
-            ]
-        }
+#         data modify storage reef.test:registry f'page."reef.test:screen_{i}/post_outro"' set value {
+#             sequence: [
+#                 [
+#                     {
+#                         type: "graphic",
+#                         model: f"reef:graphic/animated_checkerboard_background/{screen_size}",
+#                         pos: [0, 0, -0.01],
+#                     },
+#                     {
+#                         type: "text",
+#                         text: [{text: "fish", font: "reef:poppins"}, {text: "🐟🐟🐟", font: "default"}],
+#                         pos: [3, -3, 0],
+#                         scale: [3, 3, 1]
+#                     }
+#                 ]
+#             ]
+#         }
 
-        function reef:api/register/slideshow {identifier: f"reef.test:screen_{i}", storage_path: f'reef.test:registry slideshow."reef.test:screen_{i}"'}
-        function reef:api/register/page {identifier: f"reef.test:screen_{i}/intro", storage_path: f'reef.test:registry page."reef.test:screen_{i}/intro"'}
-        function reef:api/register/page {identifier: f"reef.test:screen_{i}/resolution_test", storage_path: f'reef.test:registry page."reef.test:screen_{i}/resolution_test"'}
-        function reef:api/register/page {identifier: f"reef.test:screen_{i}/screen_info", storage_path: f'reef.test:registry page."reef.test:screen_{i}/screen_info"'}
-        function reef:api/register/page {identifier: f"reef.test:screen_{i}/outro", storage_path: f'reef.test:registry page."reef.test:screen_{i}/outro"'}
-        function reef:api/register/page {identifier: f"reef.test:screen_{i}/post_outro", storage_path: f'reef.test:registry page."reef.test:screen_{i}/post_outro"'}
+#         function reef:api/register/slideshow {identifier: f"reef.test:screen_{i}", storage_path: f'reef.test:registry slideshow."reef.test:screen_{i}"'}
+#         function reef:api/register/page {identifier: f"reef.test:screen_{i}/intro", storage_path: f'reef.test:registry page."reef.test:screen_{i}/intro"'}
+#         function reef:api/register/page {identifier: f"reef.test:screen_{i}/resolution_test", storage_path: f'reef.test:registry page."reef.test:screen_{i}/resolution_test"'}
+#         function reef:api/register/page {identifier: f"reef.test:screen_{i}/screen_info", storage_path: f'reef.test:registry page."reef.test:screen_{i}/screen_info"'}
+#         function reef:api/register/page {identifier: f"reef.test:screen_{i}/outro", storage_path: f'reef.test:registry page."reef.test:screen_{i}/outro"'}
+#         function reef:api/register/page {identifier: f"reef.test:screen_{i}/post_outro", storage_path: f'reef.test:registry page."reef.test:screen_{i}/post_outro"'}
 
-for screen_size in screen_sizes:
-    formatted_screen_size = f"{screen_size[0]}x{screen_size[1]}"
+# for screen_size in screen_sizes:
+#     formatted_screen_size = f"{screen_size[0]}x{screen_size[1]}"
 
-    GraphicElement(
-        id=f"reef:graphic/animated_checkerboard_background/{formatted_screen_size}",
-        texture=f"reef:graphic/animated_checkerboard_background_{formatted_screen_size}",
-        size=screen_size
-    ).create_model().create_item_definition()
+#     GraphicElement(
+#         id=f"reef:graphic/animated_checkerboard_background/{formatted_screen_size}",
+#         texture=f"reef:graphic/animated_checkerboard_background_{formatted_screen_size}",
+#         size=screen_size
+#     ).create_model().create_item_definition()
 
-    TransitionElement(
-        id=f"reef:transition/blue_slide_up/{formatted_screen_size}",
-        texture="reef:transition/blue_slide_up",
-        size=screen_size,
-        frames=21
-    ).create_model().create_item_definition()
+#     TransitionElement(
+#         id=f"reef:transition/blue_slide_up/{formatted_screen_size}",
+#         texture="reef:transition/blue_slide_up",
+#         size=screen_size,
+#         frames=21
+#     ).create_model().create_item_definition()
 
-    TransitionElement(
-        id=f"reef:transition/smithed_slide_up/{formatted_screen_size}",
-        texture="reef:transition/smithed_slide_up",
-        size=screen_size,
-        frames=21
-    ).create_model().create_item_definition()
+#     TransitionElement(
+#         id=f"reef:transition/smithed_slide_up/{formatted_screen_size}",
+#         texture="reef:transition/smithed_slide_up",
+#         size=screen_size,
+#         frames=21
+#     ).create_model().create_item_definition()
 
-    append function reef:test/define_test_values:
-        data modify storage reef.test:registry f'transition."reef.test:blue_slide_up/{formatted_screen_size}"' set value {
-            frames: 21,
-            switch_frame: 11,
-            model: f"reef:transition/blue_slide_up/{formatted_screen_size}",
-        }
+#     append function reef:test/define_test_values:
+#         data modify storage reef.test:registry f'transition."reef.test:blue_slide_up/{formatted_screen_size}"' set value {
+#             frames: 21,
+#             switch_frame: 11,
+#             model: f"reef:transition/blue_slide_up/{formatted_screen_size}",
+#         }
 
-        data modify storage reef.test:registry f'transition."reef.test:smithed_slide_up/{formatted_screen_size}"' set value {
-            frames: 21,
-            switch_frame: 11,
-            model: f"reef:transition/smithed_slide_up/{formatted_screen_size}",
-        }
+#         data modify storage reef.test:registry f'transition."reef.test:smithed_slide_up/{formatted_screen_size}"' set value {
+#             frames: 21,
+#             switch_frame: 11,
+#             model: f"reef:transition/smithed_slide_up/{formatted_screen_size}",
+#         }
 
-        function reef:api/register/transition {identifier: f"reef.test:blue_slide_up/{formatted_screen_size}", storage_path: f'reef.test:registry transition."reef.test:blue_slide_up/{formatted_screen_size}"'}
-        function reef:api/register/transition {identifier: f"reef.test:smithed_slide_up/{formatted_screen_size}", storage_path: f'reef.test:registry transition."reef.test:smithed_slide_up/{formatted_screen_size}"'}
+#         function reef:api/register/transition {identifier: f"reef.test:blue_slide_up/{formatted_screen_size}", storage_path: f'reef.test:registry transition."reef.test:blue_slide_up/{formatted_screen_size}"'}
+#         function reef:api/register/transition {identifier: f"reef.test:smithed_slide_up/{formatted_screen_size}", storage_path: f'reef.test:registry transition."reef.test:smithed_slide_up/{formatted_screen_size}"'}

@@ -142,7 +142,7 @@ class MiniSlideshow(ItemDisplayElement):
                         "value": 66046
                     }]
                 }
-            })
+            })  
         
         item_model self.id.full ({
             "model": {
