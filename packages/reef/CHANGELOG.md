@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0-beta6] - 2026-06-28
 
-## Added
+### Added
 - Reef Element asset namespace (`assets/ns/reef/element`) that generates models and item model definitions to use in Reef slideshows.
   * `reef:graphic` Reef Element type.
   * `reef:animated_element` Reef Element type.
