@@ -71,5 +71,5 @@ jobs:
         version: ${{ steps.beet.outputs.version }}
         game-versions: |
           26.2
-        loaders: minecraft
+        loaders: datapack
         changelog: ${{ steps.changelog_reader.outputs.changes }}
