@@ -1,16 +1,12 @@
-# from reef:element import GraphicElement, AnimatedGraphicElement, TransitionElement
+# reef_element_asset ~/animation_text {
+#     "type": "reef:animated_element",
+#     "texture": "reef:item/reef/animated_graphic/animation_text",
+#     "size": [128, 64],
+#     "frames": 37
+# }
 
-# AnimatedGraphicElement(
-#     id=f"reef:animated_graphic/animation_text",
-#     texture=f"reef:animated_graphic/animation_text",
-#     size=(128, 64),
-#     frames=37
-# ).create_model().create_item_definition()
-
-# GraphicElement(
-#     id=f"reef:graphic/yellow_gradient",
-#     texture=f"reef:graphic/yellow_gradient",
-#     size=(528, 288)
-# ).create_model().create_item_definition()
-
-# # todo: update reef-beet-plugin to support asset element definitions
+# reef_element_asset ~/yellow_gradient {
+#     "type": "reef:graphic",
+#     "texture": "reef_summit:reef/graphic/yellow_gradient",
+#     "size": [528, 288]
+# }

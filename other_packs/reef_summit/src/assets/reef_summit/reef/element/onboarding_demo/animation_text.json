@@ -1,6 +1,0 @@
-{
-    "type": "reef:animated_element",
-    "texture": "reef:item/reef/animated_graphic/animation_text",
-    "size": [128, 64],
-    "frames": 37
-}
