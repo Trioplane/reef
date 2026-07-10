@@ -10,6 +10,17 @@ dependencies = [
     "bolt-expressions==0.19.2",
     "bolt-native-macros==0.5.1",
     "mecha==0.104.0",
+    "odfdo>=3.22.10",
     "pdf2image==1.17.0",
-    "reef-beet-plugin==1.0.0b6"
+    "reef-beet-plugin==1.0.0b6",
+]
+
+[tool.uv.sources]
+beet = { git = "https://github.com/TheNuclearNexus/beet", branch = "fix/nested-resources-not-bound" }
+mecha = { git = "https://github.com/TheNuclearNexus/beet", subdirectory = "packages/mecha", branch = "fix/nested-resources-not-bound" }
+reef-beet-plugin = { workspace = true, editable = true }
+
+[tool.uv.workspace]
+members = [
+    "packages/reef",
 ]

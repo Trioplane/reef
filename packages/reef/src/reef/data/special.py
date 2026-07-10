@@ -66,13 +66,11 @@ def create_reef_special_data_namespace(ctx: Context, opts: ReefPluginOptions):
         def bind(self, pack: DataPack, path: str):
             super().bind(pack, path)
             
-            namespace, _, path = path.partition(":")
-            json_info: ReefSpecialDataPdfModel | ReefSpecialDataItemModelModel = self.data.root
+            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             
-            if json_info.type in ("reef:pdf", "reef:item_model"):
-                self.generate_reef_mini_functions(pack, namespace, path)
-            else:
-                logger.debug("Unknown reef special file type. Ignoring.")
+            namespace, _, path = path.partition(":")
+            
+            self.generate_reef_mini_functions(pack, namespace, path)
                 
             raise Drop()
              
