@@ -8,9 +8,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./main
 
     steps:
     - uses: actions/checkout@v6
@@ -27,7 +24,9 @@ jobs:
 
     - name: Build Beet project
       id: beet
-      uses: Trioplane/action-build-beet-project@v1
+      uses: Trioplane/action-build-beet-project@v4
+      with:
+        beet-dir: "main"
 
     - name: Zip build output
       run: |
@@ -47,7 +46,7 @@ jobs:
       with:
         validation_level: warn
         version: ${{ steps.beet.outputs.version }}
-        path: ./CHANGELOG.md
+        path: ./main/CHANGELOG.md
           
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
