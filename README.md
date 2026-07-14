@@ -4,7 +4,7 @@ Reef is a slideshow / slide deck / presentation library that provides tools to m
 
 ---
 
-> [!INFO]
+> [!NOTE]
 > This repository is a monorepo.
 
 - [Reef Data Pack Library](main/README.md)
