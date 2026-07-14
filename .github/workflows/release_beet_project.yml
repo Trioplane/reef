@@ -1,9 +1,6 @@
 name: Release Beet project
 
-on:
-  push:
-    tags:
-      - 'v*'
+on: workflow_dispatch
 
 permissions:
   contents: write
@@ -44,18 +41,12 @@ jobs:
           (cd "$dir" && zip -r "${GITHUB_WORKSPACE}/${name}.zip" .)
         done
 
-    - name: Get version from tag
-      id: tag_name
-      run: |
-        echo "current_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-      shell: bash
-
     - name: Get Changelog Entry
       id: changelog_reader
       uses: mindsers/changelog-reader-action@v2
       with:
         validation_level: warn
-        version: ${{ steps.tag_name.outputs.current_version }}
+        version: ${{ steps.beet.outputs.version }}
         path: ./CHANGELOG.md
           
     - name: Create GitHub Release
