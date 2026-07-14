@@ -1,5 +1,5 @@
 def main():
-    print("Hello from reef!")
+    print("Hello from reef-summit!")
 
 
 if __name__ == "__main__":

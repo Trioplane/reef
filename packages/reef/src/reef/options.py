@@ -6,7 +6,7 @@ class PdfPluginOptions(PluginOptions):
     dpi: int = 200
     
 class OdpPluginOptions(PluginOptions):
-    cm_per_block: int = 16
+    cm_per_block: int = 1
     
 class ReefPluginOptions(PluginOptions):
     tint: int | None = None

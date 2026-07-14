@@ -1,26 +1,10 @@
 [project]
-name = "reef"
-version = "1.0.0-beta7"
-description = "Create stunning presentations completely in vanilla Minecraft: Java Edition"
+name = "reef-monorepo"
+version = "1.0.0"
+description = "Reef monorepo"
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = [
-    "beet==0.116.0",
-    "bolt==0.50.1",
-    "bolt-expressions==0.19.2",
-    "bolt-native-macros==0.5.1",
-    "mecha==0.104.0",
-    "odfdo>=3.22.10",
-    "pdf2image==1.17.0",
-    "reef-beet-plugin==1.0.0b6",
-]
-
-[tool.uv.sources]
-beet = { git = "https://github.com/TheNuclearNexus/beet", branch = "fix/nested-resources-not-bound" }
-mecha = { git = "https://github.com/TheNuclearNexus/beet", subdirectory = "packages/mecha", branch = "fix/nested-resources-not-bound" }
-reef-beet-plugin = { workspace = true, editable = true }
+dependencies = []
 
 [tool.uv.workspace]
-members = [
-    "packages/reef",
-]
+members = ["main", "packages/*", "other_packs/*"]

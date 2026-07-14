@@ -4,16 +4,24 @@ Reef is a slideshow / slide deck / presentation library that provides tools to m
 
 ---
 
-> [!INFO]
-> This repository is a monorepo.
+<p align="center"><img src="repository/warning_sign.png" alt="Warning Sign" /></p>
 
-- [Reef Data Pack Library](main/README.md)
-- [Reef Beet Plugin](packages/reef/README.md)
+> [!WARNING]
+> This is currently **work in progress!** Be cautious when using this library in its unfinished state as it may break your world!
+
+<p align="center"><img src="repository/warning_sign.png" alt="Warning Sign" /></p>
 
 <p align="center">
   <a href="https://github.com/Trioplane/reef/releases"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/github_vector.svg" alt="GitHub Releases" /></a>
   <a href="https://modrinth.com/datapack/reef-slideshow-library"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg" alt="GitHub Releases" /></a>
 </p>
+
+## Features *(to implement)*
+- Data-driven slideshow definitions
+  * Includes: data-driven pages, elements, transitions
+- Items:
+  * Remote - controls the screen it is linked to
+- *...and more coming soon!*
 
 ## Credits
 - Author - [@trplnr](https://github.com/trplnr)

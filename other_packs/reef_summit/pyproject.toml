@@ -1,0 +1,16 @@
+[project]
+name = "reef-summit"
+version = "0.1.0"
+description = "Demo and testing reef slideshows for Smithed Summit"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "beet>=0.116.0",
+    "bolt>=0.50.1",
+    "mecha",
+    "reef-beet-plugin",
+]
+
+[tool.uv.sources]
+mecha = { git = "https://github.com/TheNuclearNexus/beet", subdirectory = "packages/mecha", branch = "fix/nested-resources-not-bound" }
+reef-beet-plugin = { workspace = true, editable = true }

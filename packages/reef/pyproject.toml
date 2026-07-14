@@ -14,7 +14,8 @@ keywords = ["beet", "minecraft", "datapack", "resource_pack", "presentation", "r
 requires-python = ">=3.14"
 dependencies = [
     "beet>=0.116.0",
-    "pdf2image>=1.17.0"
+    "odfdo>=3.22.10",
+    "pdf2image>=1.17.0",
 ]
 
 [project.urls]

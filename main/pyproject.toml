@@ -1,0 +1,17 @@
+[project]
+name = "reef"
+version = "1.0.0-beta7"
+description = "Create stunning presentations completely in vanilla Minecraft: Java Edition"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "beet>=0.116.0",
+    "bolt==0.50.1",
+    "bolt-expressions==0.19.2",
+    "bolt-native-macros==0.5.1",
+    "mecha>=0.104.0",
+    "reef-beet-plugin",
+]
+
+[tool.uv.sources]
+reef-beet-plugin = { workspace = true, editable = true }

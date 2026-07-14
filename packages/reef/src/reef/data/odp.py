@@ -18,23 +18,26 @@ from odfdo import Document, DrawPage
 from .. import state
 from ..models import ResourceLocation
 from ..options import ReefPluginOptions
+from .page import ReefPageData
+from .slideshow import ReefSlideshowData
 
 __all__ = ["odp", "ReefSpecialOdpData"]
 
 ODP_NAMESPACE = "reef/data/odp"
 logger = logging.getLogger(ODP_NAMESPACE)
 
-# Conversion Units
-PT_TO_CM = 0.03528
-
 class ReefSpecialOdpData(File):
     """Class representing OpenDocument files inside data/ns/reef/special"""
     
     scope: ClassVar[NamespaceFileScope] = ("reef", "special")
     extension: ClassVar[str] = ".odp"
+    PT_TO_CM = 0.03528
+    PT_TO_BLOCKS: float
     
     def bind(self, pack: DataPack, path: str):
         super().bind(pack, path)
+        
+        self.PT_TO_BLOCKS = self.PT_TO_CM * (state.opts.odp.cm_per_block * 3.5)
         
         namespace, _, path = path.partition(":")
         
@@ -78,15 +81,33 @@ class ReefSpecialOdpData(File):
         logger.debug("TEXT STYLE NAMES: %s", text_style_names)
         logger.debug("TEXT STYLES: %s", text_styles)
         #logger.debug("TEXT PROPERTIES: %s", text_properties)
-        logger.debug("----")
+        logger.debug("---- GENERATING PACK FILES")
+
+        elements = []
+        
         for box in text_boxes:
             text_position = (box.get_attribute("svg:x"), box.get_attribute("svg:y"))
             text_style_name = box.get_span().style # type: ignore
             text_properties = doc.get_style("text", name_or_element=text_style_name).get_text_properties() # type: ignore
             
-            font_size_in_cm = int(text_properties["fo:font-size"][:-2]) * PT_TO_CM # type: ignore
+            font_size_in_blocks = int(text_properties["fo:font-size"][:-2]) * self.PT_TO_BLOCKS # type: ignore
             
-            logger.debug("Text '%s' positioned %s with font size of %s or %s", box.text_content, text_position, text_properties["fo:font-size"], font_size_in_cm)
+            logger.debug("Text '%s' positioned %s with font size of %s or %s", box.text_content, text_position, text_properties["fo:font-size"], font_size_in_blocks)
+            
+            elements.append({
+                "type": "text",
+                "text": box.text_content,
+                "pos": [float(text_position[0][:-2]) * state.opts.odp.cm_per_block, -(float(text_position[1][:-2]) * state.opts.odp.cm_per_block), 0],
+                "scale": [font_size_in_blocks, font_size_in_blocks, 1]
+            })
+            
+        pack[ReefPageData][f"{identifier}/page_1"] = ReefPageData(json.dumps({
+            "sequence": [elements]
+        }))
+        
+        pack[ReefSlideshowData][identifier] = ReefSlideshowData(json.dumps([
+            f"{identifier}/page_1"
+        ]))
             
         logger.debug("------------------------------------------------------")
 

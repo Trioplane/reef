@@ -18,8 +18,6 @@
     "require": [
         "reef",
         "bolt",
-        "bolt_expressions",
-        "bolt_native_macros",
         "beet.contrib.livereload"
     ],
     "meta": {
@@ -33,7 +31,7 @@
                 "dpi": 144
             },
             "odp": {
-                "cm_per_block": 16
+                "cm_per_block": 1
             }
         }
     },

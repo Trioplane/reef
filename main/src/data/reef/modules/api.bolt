@@ -516,6 +516,7 @@ function ~/remote/linked_remote/open_slideshow_settings:
                     "type": "minecraft:text",
                     "key": "id",
                     "width": 100,
+                    "max_length": 2147483647,
                     "label": {
                         "text": "Slideshow Identifier",
                         "color": "gray",
@@ -569,6 +570,7 @@ function ~/remote/linked_remote/open_slideshow_settings:
                     "type": "minecraft:text",
                     "key": "index",
                     "width": 100,
+                    "max_length": 10,
                     "label": {
                         "text": "Page Index",
                         "color": "gray",
@@ -577,8 +579,7 @@ function ~/remote/linked_remote/open_slideshow_settings:
                             "action": "show_text",
                             "value": "0-based indexing"
                         }
-                    },
-                    "max_length": 6
+                    }
                 }
             ],
             "pause": false,
