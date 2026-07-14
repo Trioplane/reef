@@ -24,7 +24,7 @@ jobs:
 
     - name: Build Beet project
       id: beet
-      uses: Trioplane/action-build-beet-project@v4
+      uses: Trioplane/action-build-beet-project@v5-beta1
       with:
         beet-dir: "main"
 
