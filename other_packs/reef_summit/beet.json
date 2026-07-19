@@ -25,7 +25,7 @@
             "entrypoint": "reef_summit:*"
         },
         "reef": {
-            "compress_functions": true,
+            "compress_functions": false,
             "tint": 66046,
             "pdf": {
                 "dpi": 144
