@@ -13,7 +13,10 @@ Reef is a slideshow / slide deck / presentation library that provides tools to m
 
 <p align="center">
   <a href="https://github.com/Trioplane/reef/releases"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/github_vector.svg" alt="GitHub Releases" /></a>
-  <a href="https://modrinth.com/datapack/reef-slideshow-library"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg" alt="GitHub Releases" /></a>
+  <a href="https://modrinth.com/datapack/reef-slideshow-library"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg" alt="Modrinth Releases" /></a>
+</p>
+<p align="center">
+  <a href="https://smithed.net/summit"><img src="./repository/cozy-singular-smithed-summit-2026_vector.svg" alt="See me on Smithed Summit 2026" /></a>
 </p>
 
 ## Features *(to implement)*
