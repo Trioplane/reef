@@ -1,30 +1,25 @@
-<p align="center"><img src="repository/reef_banner.png" alt="Reef Banner" /></p>
+<p align="center"><img src="../repository/reef_banner.png" alt="Reef Banner" /></p>
 
-Reef is a slideshow / slide deck / presentation library that provides tools to make, and present slideshows in-game in Minecraft: Java Edition.
-
----
-
-<p align="center"><img src="repository/warning_sign.png" alt="Warning Sign" /></p>
-
-> [!WARNING]
-> This is currently **work in progress!** Be cautious when using this library in its unfinished state as it may break your world!
-
-<p align="center"><img src="repository/warning_sign.png" alt="Warning Sign" /></p>
+> Reef is a slideshow / slide deck / presentation library that provides tools to make, and present slideshows in-game in Minecraft: Java Edition.
 
 <p align="center">
   <a href="https://github.com/Trioplane/reef/releases"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/github_vector.svg" alt="GitHub Releases" /></a>
   <a href="https://modrinth.com/datapack/reef-slideshow-library"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/available/modrinth_vector.svg" alt="Modrinth Releases" /></a>
 </p>
 <p align="center">
-  <a href="https://smithed.net/summit"><img src="./repository/cozy-singular-smithed-summit-2026_vector.svg" alt="See me on Smithed Summit 2026" /></a>
+  <a href="https://smithed.net/summit"><img src="../repository/cozy-singular-smithed-summit-2026_vector.svg" alt="See me on Smithed Summit 2026" /></a>
 </p>
 
-## Features *(to implement)*
-- Data-driven slideshow definitions
-  * Includes: data-driven pages, elements, transitions
-- Items:
-  * Remote - controls the screen it is linked to
-- *...and more coming soon!*
+<p align="center">
+  <img src="../repository/slideshow_definitions.png" alt="Data-driven Slideshow Definitions with Beet integration">
+  <img src="../repository/remote_ui.png" alt="Remote GUI">
+</p>
+
+REMOTE SHOWCASE
+
+ALL ELEMENT TYPES SHOWCASE
+
+BEET PLUGIN SHOWCASE
 
 ## Credits
 - Author - [@trplnr](https://github.com/trplnr)

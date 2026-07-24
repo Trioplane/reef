@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - *nothing yet...* 
 
+## [1.0.0] - 2026-07-24
+
+### Changed
+
+- The uninstall function removes all the new scoreboard and storages introduced in the preivous versions, as well as clearing Reef specific items too.
+
+### Removed
+
+- Dead code.
+- Unused or concept features that did not make the final cut.
+- Debug code.
+
 ## [1.0.0-beta7] - 2026-06-28
 
 ### Fixed
