@@ -34,8 +34,6 @@ function reef:tick:
     function reef:api/tick
     function reef:zzzinternals/tick
 
-    execute if entity @a[tag=trplnr.debug] unless entity @n[tag=rah] run summon item_display ~ ~ ~ {item:{id: "amethyst_shard"},Tags:["rah"]}
-
 function reef:uninstall:
     data remove storage reef.zzzinternals:in register
     data remove storage reef.zzzinternals:in remote
@@ -44,6 +42,7 @@ function reef:uninstall:
     data remove storage reef.zzzinternals:registry page
     data remove storage reef.zzzinternals:registry transition
     data remove storage reef.zzzinternals:tmp root
+    data remove storage reef.zzzinternals:tmp register
 
     scoreboard objectives remove reef.zzzinternals.screen.id
     scoreboard objectives remove reef.zzzinternals.element.id
@@ -61,14 +60,16 @@ function reef:uninstall:
     scoreboard objectives remove reef.zzzinternals.parent.element.id
     scoreboard objectives remove reef.zzzinternals.parent.screen.id
     scoreboard objectives remove reef.zzzinternals.id_link
+    scoreboard objectives remove reef.zzzinternals.register.mini
 
     kill @e[tag=reef.entity]
+    clear @a *[minecraft:custom_data~{reef:{item:{id:"reef:remote"}}}]
 
     LOGGER.info("@a[tag=reef.permissions.see_debug]", [
         "",
         {text: "Uninstallation in progress... (read below)\n", color: "red"},
         {text: "Thanks for using Reef!\n", underlined: true},
-        {text: "All storages, scoreboards, and entities related to Reef have been deleted from your world.\n\n", color: "gray", italic: true},
+        {text: "All storages, scoreboards, and loaded entities related to Reef have been deleted from your world.\n\n", color: "gray", italic: true},
         {text: "You can now delete the data pack file.\n\n", bold: true},
         {text: "If you didn't mean to run the uninstall function, you can /reload to cancel the process and continue using Reef.\n", color: "gray", italic: true},
     ])

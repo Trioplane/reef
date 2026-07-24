@@ -129,18 +129,14 @@ function ~/register/transition:
     $data modify storage reef.zzzinternals:registry transition."$(identifier)" set from storage $(storage_path)
     LOGGER.info("@a[tag=reef.permissions.see_debug]", [{"text": "Registered transition "}, {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}, {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Location: ", {storage: "reef.zzzinternals:in", nbt: "register.transition.storage_path"}, "\n", "Identifier: ", {storage: "reef.zzzinternals:in", nbt: "register.transition.identifier"}]}}])
 
-function ~/register/transition/keywords:
-    def addKeyword(id, builtin_transition, options={}):
-        data remove storage reef.zzzinternals:registry f'transition."{id}"'
-        data modify storage reef.zzzinternals:registry f'transition."{id}"' set value {
-            _builtin: builtin_transition,
-            **options
-        }
-        DEV_LOGGER.info("@a", f"KEYWORD '{id}' REGISTERED")
-
-
-    data remove storage reef.zzzinternals:registry transition."none"
-    addKeyword("reef:wipe", "wipe", options={"frames": 20, "switch_frame": 10})
+# function ~/register/transition/keywords:
+#     def addKeyword(id, builtin_transition, options={}):
+#         data remove storage reef.zzzinternals:registry f'transition."{id}"'
+#         data modify storage reef.zzzinternals:registry f'transition."{id}"' set value {
+#             _builtin: builtin_transition,
+#             **options
+#         }
+#         DEV_LOGGER.info("@a", f"KEYWORD '{id}' REGISTERED")
 
 function ~/register/mini:
     $execute unless data storage $(storage_path) run return run function reef:zzzinternals/register/mini/errors/definition_not_found
@@ -291,8 +287,7 @@ function ~/screen/transition_to_page:
 
         execute if function reef:zzzinternals/screen/display/transition/is_switch_frame:
             DEV_LOGGER.info("@a", "SWITCHING PAGE!!")
-            if not TempStorage.transition._skip_cut:
-                function reef:zzzinternals/screen/cut_to_page
+            function reef:zzzinternals/screen/cut_to_page
             tag @s add reef.screen.transition.finished
 
 function ~/screen/has_finished_transition:
@@ -628,15 +623,7 @@ function ~/screen/display/transition:
         Self.transformation.right_rotation = TransitionData.right_rotation
 
     function ~/restart:
-        DEV_LOGGER.info("@a", "FAHHHHHHHHHHHHHHH")
         function ~/../load_transition
-
-        if TransitionData._builtin:
-            return run function reef:zzzinternals/screen/display/transition/run_builtin/:
-                execute if data storage reef.zzzinternals:tmp root.transition{_builtin: "wipe"} run return run function reef:zzzinternals/screen/display/transition/builtin/wipe
-
-                LOGGER.error("@a[tag=reef.permissions.see_debug]", ["Unknown builtin transition.", {"text": " (hover for more info)", "color": "dark_gray", "hover_event": {"action": "show_text", "value": ["Screen position: ", {"entity": "@s", "nbt": "Pos"}]}}])
-
         tag @s remove reef.element.transition.finished
 
     function ~/is_switch_frame:
@@ -644,15 +631,6 @@ function ~/screen/display/transition:
         if CurrentFrame["@n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"] >= SwitchFrame["@n[type=item_display,tag=reef.element.transition,predicate=reef:zzzinternals/id_link/parent/screen]"]:
             return 1
         return fail
-
-        function ~/wipe:
-            DEV_LOGGER.info("@a", "WIPE!!!!!!!!!")
-            # TODO: Implement wipe
-            # TODO: spawns an angled display the size of the screen in options
-            # TODO: moves the display infront smoothly
-            # TODO: cut to next page (handled by switch frame)
-            # TODO: move the display behind smoothly
-            # TODO: kill the display
 
 function ~/screen/is_current_sequence_finished:
     execute if data entity @s data.reef.screen.slideshow.current.page_data.sequence[0] run return fail
