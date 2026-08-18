@@ -492,7 +492,7 @@ requires-dist = [
 
 [[package]]
 name = "reef-beet-plugin"
-version = "1.0.0b11"
+version = "1.0.0b12"
 source = { editable = "packages/reef" }
 dependencies = [
     { name = "beet" },
