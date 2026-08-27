@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- *nothing yet...*
+- `dpi` field in `.pdf.mcmeta` files that override the DPI to render the PDF with. If not present, uses the `default_dpi` in plugin options.
+
+## Changes
+
+- `dpi` field in plugin options renamed to `default_dpi`
 
 ## [1.0.0-beta12]
 
