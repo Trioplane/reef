@@ -3,7 +3,7 @@ from beet import PluginOptions
 
 class PdfPluginOptions(PluginOptions):
     poppler_path: str | None = None
-    dpi: int = 200
+    default_dpi: int = 200
     
 class OdpPluginOptions(PluginOptions):
     cm_per_block: int = 1

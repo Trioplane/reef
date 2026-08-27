@@ -41,6 +41,7 @@ class ReefPdfAsset(File):
 
         namespace, _, path = path.partition(":")
         pdf_path = Path(file.ensure_source_path())
+        pdf_options = file.get_pdf_options(f"{namespace}:{path}")
 
         # ---------------------
 
@@ -61,6 +62,8 @@ class ReefPdfAsset(File):
                 cache.json["options"] = opts_dict
 
         # Cache the images if we didn't hit the cache
+        dpi = state.opts.pdf.default_dpi if pdf_options is None else pdf_options.dpi
+
         if state.ctx.cache[PDF_NAMESPACE].has_changed(pdf_path):
             logger.debug("Recaching image files...")
             with TemporaryDirectory() as temp_dir:
@@ -70,7 +73,7 @@ class ReefPdfAsset(File):
                     pdf_path=pdf_path,
                     fmt="png",
                     output_folder=temp_dir,
-                    dpi=state.opts.pdf.dpi,
+                    dpi=dpi,
                     thread_count=4,
                     paths_only=True,
                     **poppler_path
@@ -111,12 +114,11 @@ class ReefPdfAsset(File):
                     logger.debug("Copied %s (%s)", f"{namespace}:{path}/{i}.png", cache_path)
 
         # Find if there is a matching .pdf.mcmeta and get the page size
-        pdf_mcmeta_file = state.ctx.assets[ReefPdfMcmeta].get(f"{namespace}:{path}")
         page_size: tuple[float, float]
 
-        if pdf_mcmeta_file is not None:
+        if pdf_options is not None:
             logger.debug(f"FOUND PDF MCMETA FILE {namespace}:{path}")
-            page_size = (pdf_mcmeta_file.data.size[0], pdf_mcmeta_file.data.size[1])
+            page_size = (pdf_options.size[0], pdf_options.size[1])
         else:
             pdf_size_match = re.match(r"([\d.]+) x ([\d.]+) pts", pdf_info["Page size"])
 
@@ -127,6 +129,14 @@ class ReefPdfAsset(File):
 
         # Generate the resource pack assets
         file.generate_assets(pack, namespace, path, images, page_size)
+
+    def get_pdf_options(self, path: str) -> ReefPdfMcmetaModel | None:
+        pdf_mcmeta_file = state.ctx.assets[ReefPdfMcmeta].get(path)
+        if pdf_mcmeta_file is not None:
+            logger.debug("PDF MCMeta file found in %s", path)
+            return pdf_mcmeta_file.data
+
+        return None
 
     def generate_assets(
         self,

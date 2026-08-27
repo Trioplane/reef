@@ -52,6 +52,6 @@ G_ENVIRONMENT_TYPES = {
     "production": Environment(name="production", options=EnvironmentOptions(dev_logs=False)),
     "summit": Environment(name="summit", options=EnvironmentOptions(dev_logs=False))
 }
-G_ENVIRONMENT = G_ENVIRONMENT_TYPES.summit
+G_ENVIRONMENT = G_ENVIRONMENT_TYPES.production
 
 print(f"The environment is: {G_ENVIRONMENT.name}")

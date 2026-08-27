@@ -18,17 +18,13 @@ logger = logging.getLogger(PDF_NAMESPACE)
 
 class ReefPdfMcmetaModel(BaseModel):
     size: tuple[float, float]
+    dpi: float
 
 class ReefPdfMcmeta(JsonFileBase):
 
     model = ReefPdfMcmetaModel
     scope: ClassVar[NamespaceFileScope] = ("reef", "pdf")
     extension: ClassVar[str] = ".pdf.mcmeta"
-
-    def bind(self, pack, path):
-        super().bind(pack, path)
-        logger.warning("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        logger.warning(self.data)
 
 @configurable("reef", validator=ReefPluginOptions)
 def pdf_mcmeta(ctx: Context, opts: ReefPluginOptions):
