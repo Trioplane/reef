@@ -67,6 +67,6 @@ jobs:
         name: "${{ steps.beet.outputs.name }} ${{ steps.beet.outputs.version }}"
         version: ${{ steps.beet.outputs.version }}
         game-versions: |
-          26.2
+          26.3
         loaders: datapack
         changelog: ${{ steps.changelog_reader.outputs.changes }}
