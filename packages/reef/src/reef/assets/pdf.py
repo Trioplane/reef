@@ -18,6 +18,8 @@ from beet import (
 )
 from PIL import Image
 
+from reef.assets.pdf_mcmeta import ReefPdfMcmetaModel
+
 from .. import state
 from ..options import ReefPluginOptions
 from .pdf_mcmeta import ReefPdfMcmeta
@@ -62,7 +64,7 @@ class ReefPdfAsset(File):
                 cache.json["options"] = opts_dict
 
         # Cache the images if we didn't hit the cache
-        dpi = state.opts.pdf.default_dpi if pdf_options is None else pdf_options.dpi
+        dpi = pdf_options.dpi if pdf_options is not None and pdf_options.dpi is not None else state.opts.pdf.default_dpi
 
         if state.ctx.cache[PDF_NAMESPACE].has_changed(pdf_path):
             logger.debug("Recaching image files...")
@@ -116,8 +118,7 @@ class ReefPdfAsset(File):
         # Find if there is a matching .pdf.mcmeta and get the page size
         page_size: tuple[float, float]
 
-        if pdf_options is not None:
-            logger.debug(f"FOUND PDF MCMETA FILE {namespace}:{path}")
+        if pdf_options is not None and pdf_options.size is not None:
             page_size = (pdf_options.size[0], pdf_options.size[1])
         else:
             pdf_size_match = re.match(r"([\d.]+) x ([\d.]+) pts", pdf_info["Page size"])

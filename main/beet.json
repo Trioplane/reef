@@ -6,13 +6,13 @@
     "minecraft": "26.2",
     "data_pack": {
         "load": ["src"],
-        "min_format": [107,1],
-        "max_format": [107,1]
+        "min_format": [121,1],
+        "max_format": [121,1]
     },
     "resource_pack": {
         "load": ["src"],
-        "min_format": [88,0],
-        "max_format": [88,0]
+        "min_format": [97,1],
+        "max_format": [97,1]
     },
     "pipeline": ["mecha"],
     "require": [

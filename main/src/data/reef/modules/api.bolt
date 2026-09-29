@@ -162,38 +162,36 @@ loot_table reef:remote {
         }
     ]
 }
-item_modifier reef:item/remote/convert_to_unlinked_remote [
-    {
-        "function": "minecraft:set_components",
-        "components": {
-            "minecraft:item_name": [
-                "",
-                {
-                    "text": "Unlinked Remote",
-                    "color": "light_purple"
-                }
-            ],
-            "minecraft:item_model": "reef:remote",
-            "!minecraft:food": {},
-            "minecraft:max_stack_size": 1,
-            "minecraft:consumable": {
-                "consume_seconds": 9999999
-            },
-            "minecraft:custom_data": {
-                "reef": {
-                    "item": {
-                        "id": "reef:remote",
-                        "components": {
-                            "reef:link": {
-                                "linked": false
-                            }
+item_modifier reef:item/remote/convert_to_unlinked_remote {
+    "type": "minecraft:set_components",
+    "components": {
+        "minecraft:item_name": [
+            "",
+            {
+                "text": "Unlinked Remote",
+                "color": "light_purple"
+            }
+        ],
+        "minecraft:item_model": "reef:remote",
+        "!minecraft:food": {},
+        "minecraft:max_stack_size": 1,
+        "minecraft:consumable": {
+            "consume_seconds": 9999999
+        },
+        "minecraft:custom_data": {
+            "reef": {
+                "item": {
+                    "id": "reef:remote",
+                    "components": {
+                        "reef:link": {
+                            "linked": false
                         }
                     }
                 }
             }
         }
     }
-]
+}
 advancement reef:item/unlinked_remote/use {
     "criteria": {
         "use_item": {
@@ -251,7 +249,7 @@ advancement reef:item/linked_remote/use {
     }
 }
 predicate reef:item/linked_remote/use_type/primary {
-    "condition": "minecraft:entity_properties",
+    "type": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
         "minecraft:type_specific/player": {
@@ -263,7 +261,7 @@ predicate reef:item/linked_remote/use_type/primary {
     }
 }
 predicate reef:item/linked_remote/use_type/secondary {
-    "condition": "minecraft:entity_properties",
+    "type": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
         "minecraft:type_specific/player": {
@@ -275,7 +273,7 @@ predicate reef:item/linked_remote/use_type/secondary {
     }
 }
 predicate reef:item/linked_remote/use_type/tertiary {
-    "condition": "minecraft:entity_properties",
+    "type": "minecraft:entity_properties",
     "entity": "this",
     "predicate": {
         "minecraft:type_specific/player": {

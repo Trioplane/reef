@@ -27,7 +27,7 @@
             "compress_functions": false,
             "tint": 66046,
             "pdf": {
-                "dpi": 144
+                "default_dpi": 144
             },
             "odp": {
                 "cm_per_block": 1

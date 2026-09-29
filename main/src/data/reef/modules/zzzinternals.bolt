@@ -15,7 +15,7 @@ class IDFunction:
             execute store result score @s self.score_name run scoreboard players add .next self.score_name 1
 
         predicate f"reef:zzzinternals/id_link/{name}" ({
-            "condition": "minecraft:entity_scores",
+            "type": "minecraft:entity_scores",
             "entity": "this",
             "scores": {
                 self.score_name: {
@@ -40,7 +40,7 @@ class IDFunction:
         })
 
         predicate f"reef:zzzinternals/id_link/parent/{name}" ({
-            "condition": "minecraft:entity_scores",
+            "type": "minecraft:entity_scores",
             "entity": "this",
             "scores": {
                 self.parent_name: {

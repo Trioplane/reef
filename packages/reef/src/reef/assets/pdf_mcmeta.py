@@ -11,14 +11,14 @@ from pydantic import BaseModel
 
 from ..options import ReefPluginOptions
 
-__all__ = ["ReefPdfMcmeta", "pdf_mcmeta"]
+__all__ = ["ReefPdfMcmeta", "ReefPdfMcmetaModel", "pdf_mcmeta"]
 
 PDF_NAMESPACE = "reef/assets/pdf.mcmeta"
 logger = logging.getLogger(PDF_NAMESPACE)
 
 class ReefPdfMcmetaModel(BaseModel):
-    size: tuple[float, float]
-    dpi: float
+    size: tuple[float, float] | None = None
+    dpi: int | None = None 
 
 class ReefPdfMcmeta(JsonFileBase):
 
