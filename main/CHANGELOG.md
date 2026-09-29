@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [1.2.0]
 
+### Fixed
+
+- Omg i forgot to bump the version in the config file ok its actually updated to 26.3 now.
+
+# [1.2.0]
+
 ### Changed
 
 - Update to 26.3
